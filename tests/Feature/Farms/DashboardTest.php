@@ -20,6 +20,15 @@ class DashboardTest extends TestCase
         $this->get('/dashboard')->assertRedirect('/login');
     }
 
+    public function test_authenticated_user_with_no_team_is_redirected_to_team_creation(): void
+    {
+        $user = User::factory()->create(['current_team_id' => null]);
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        $response->assertRedirect(route('teams.create'));
+    }
+
     public function test_dashboard_shows_farm_summary(): void
     {
         $user = User::factory()->withPersonalTeam()->create();

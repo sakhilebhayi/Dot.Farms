@@ -31,6 +31,15 @@ class FarmCrudTest extends TestCase
         ]);
     }
 
+    public function test_user_with_no_team_cannot_create_a_farm(): void
+    {
+        $user = User::factory()->create(['current_team_id' => null]);
+
+        $this->actingAs($user)
+            ->post('/farms', ['name' => 'Vaalharts Farm'])
+            ->assertForbidden();
+    }
+
     public function test_farm_requires_a_name(): void
     {
         $user = User::factory()->withPersonalTeam()->create();

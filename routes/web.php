@@ -26,6 +26,10 @@ Route::middleware([
     Route::get('/dashboard', function () {
         $team = auth()->user()->currentTeam;
 
+        if (! $team) {
+            return redirect()->route('teams.create');
+        }
+
         $farmIds = Farm::where('team_id', $team->id)->pluck('id');
         $fieldIds = Field::whereIn('farm_id', $farmIds)->pluck('id');
 

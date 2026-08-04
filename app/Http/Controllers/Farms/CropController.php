@@ -6,14 +6,26 @@ use App\Http\Controllers\Controller;
 use App\Models\Crop;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class CropController extends Controller
 {
+    /**
+     * A user can reach this controller's action methods (via a
+     * previously-loaded form) after being removed from their last team,
+     * at which point currentTeam is genuinely null. See wiki.md Change
+     * Log 2026-08-04.
+     */
+    private function resolveCurrentTeam(): ?\App\Models\Team
+    {
+        return Auth::user()?->currentTeam;
+    }
+
     public function index(Request $request): View
     {
+        // team scoping is handled by Crop's HasTeamScope global scope
         $crops = Crop::query()
-            ->where('team_id', $request->user()->currentTeam->id)
             ->withCount('cropCycles')
             ->orderBy('name')
             ->get();
@@ -30,6 +42,11 @@ class CropController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $team = $this->resolveCurrentTeam();
+        if (! $team) {
+            abort(403, 'No active team selected.');
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'variety' => ['nullable', 'string', 'max:255'],
@@ -39,7 +56,7 @@ class CropController extends Controller
 
         $crop = Crop::create([
             ...$validated,
-            'team_id' => $request->user()->currentTeam->id,
+            'team_id' => $team->id,
         ]);
 
         return redirect()->route('crops.index')->with('flash.banner', "Crop \"{$crop->displayName()}\" added.");

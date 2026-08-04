@@ -6,17 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Models\Farm;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class FarmController extends Controller
 {
+    /**
+     * A user can reach this controller's action methods (via a
+     * previously-loaded form) after being removed from their last team,
+     * at which point currentTeam is genuinely null. See wiki.md Change
+     * Log 2026-08-04.
+     */
+    private function resolveCurrentTeam(): ?\App\Models\Team
+    {
+        return Auth::user()?->currentTeam;
+    }
+
     public function index(Request $request): View
     {
-        $team = $request->user()->currentTeam;
-
+        // team scoping is handled by Farm's HasTeamScope global scope
         $farms = Farm::query()
-            ->where('team_id', $team->id)
             ->withCount('fields')
             ->orderBy('name')
             ->get();
@@ -37,6 +47,11 @@ class FarmController extends Controller
     {
         Gate::authorize('create', Farm::class);
 
+        $team = $this->resolveCurrentTeam();
+        if (! $team) {
+            abort(403, 'No active team selected.');
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'location' => ['nullable', 'string', 'max:255'],
@@ -46,7 +61,7 @@ class FarmController extends Controller
 
         $farm = Farm::create([
             ...$validated,
-            'team_id' => $request->user()->currentTeam->id,
+            'team_id' => $team->id,
             'status' => 'active',
         ]);
 
