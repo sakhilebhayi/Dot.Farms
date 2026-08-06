@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTeamScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,10 +12,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * A team-owned crop catalog entry (e.g. "Maize", "Tomato — Roma"),
  * reused across fields and seasons via CropCycle. Team-scoped directly
  * since a crop definition isn't owned by any single farm.
+ *
+ * HasTeamScope keeps every query against this table scoped to the
+ * current team by default (see app/Models/Concerns/HasTeamScope.php).
  */
 class Crop extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTeamScope;
 
     protected $fillable = [
         'team_id',

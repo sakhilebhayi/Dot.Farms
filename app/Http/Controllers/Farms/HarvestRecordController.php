@@ -19,10 +19,11 @@ class HarvestRecordController extends Controller
      */
     public function index(Request $request): View
     {
-        $team = $request->user()->currentTeam;
-
+        // whereHas builds its subquery against Farm, so Farm's HasTeamScope
+        // global scope already limits this to the current team -- no need
+        // to add an explicit team_id constraint here.
         $harvestRecords = HarvestRecord::query()
-            ->whereHas('cropCycle.field.farm', fn ($q) => $q->where('team_id', $team->id))
+            ->whereHas('cropCycle.field.farm')
             ->with(['cropCycle.crop', 'cropCycle.field.farm'])
             ->latest('harvested_at')
             ->paginate(20);

@@ -19,7 +19,10 @@ class CropCycleController extends Controller
         Gate::authorize('update', $farm);
         abort_unless($field->farm_id === $farm->id, 404);
 
-        $crops = Crop::where('team_id', $farm->team_id)->orderBy('name')->get();
+        // $farm is only reachable here if it's in the current team (Farm's
+        // HasTeamScope), so Crop's own HasTeamScope already limits this to
+        // the same team -- no need to re-check team_id explicitly.
+        $crops = Crop::orderBy('name')->get();
 
         return view('crop-cycles.create', [
             'farm' => $farm,
@@ -40,8 +43,10 @@ class CropCycleController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
+        // Same reasoning as create(): Crop's HasTeamScope already limits
+        // this lookup to the current (== $farm's) team.
         abort_unless(
-            Crop::where('id', $validated['crop_id'])->where('team_id', $farm->team_id)->exists(),
+            Crop::where('id', $validated['crop_id'])->exists(),
             404
         );
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTeamScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,10 +13,13 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * Tenant root of the agriculture domain (wiki.md §4). Every field, crop
  * cycle, planting record, and harvest record hangs off a Farm, and a
  * Farm belongs to exactly one Team — that is the tenant boundary.
+ *
+ * HasTeamScope keeps every query against this table scoped to the
+ * current team by default (see app/Models/Concerns/HasTeamScope.php).
  */
 class Farm extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTeamScope;
 
     protected $fillable = [
         'team_id',
