@@ -3,351 +3,294 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Dot.Farms - Agriculture ERP for Crop Planning, Planting & Harvest</title>
+        <title>Dot.Farms — Agriculture ERP for crop planning, planting &amp; harvest</title>
         <meta name="description" content="Plan crop cycles, log planting and harvest events, and track yield across every field and season — the agriculture system of record for the Dot Ecosystem.">
 
-        @fonts
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
-        <!-- Styles / Scripts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <style>
-            @keyframes float {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-20px); }
+            :root {
+                --paper: #f7f2e3;
+                --paper-deep: #efe6cd;
+                --ink: #26311c;
+                --ink-soft: #3a4629;
+                --forest: #3f5a28;
+                --forest-deep: #2a3d1a;
+                --gold: #dda52e;
+                --gold-soft: #f0c862;
+                --soil: #8a6239;
+                --line: rgba(38, 49, 28, 0.14);
+                --font-display: 'Fraunces', ui-serif, Georgia, serif;
+                --font-body: 'Karla', system-ui, sans-serif;
+                --font-mono: 'Space Mono', ui-monospace, monospace;
+                --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
             }
-            .float-animation {
-                animation: float 6s ease-in-out infinite;
-            }
-            @keyframes slideInUp {
-                from {
+            html { background: var(--paper); }
+            body { font-family: var(--font-body); background: var(--paper); color: var(--ink); }
+            .font-display { font-family: var(--font-display); font-optical-sizing: auto; }
+            .font-mono { font-family: var(--font-mono); }
+
+            .press { transition: transform 160ms var(--ease-out); }
+            .press:active { transform: scale(0.97); }
+
+            @media (prefers-reduced-motion: no-preference) {
+                .reveal {
                     opacity: 0;
-                    transform: translateY(30px);
+                    transform: translateY(14px);
+                    transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
                 }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+                .reveal.is-visible { opacity: 1; transform: translateY(0); }
             }
-            .slide-in-up {
-                animation: slideInUp 0.8s ease-out forwards;
+            @media (prefers-reduced-motion: reduce) {
+                .reveal { opacity: 1; transform: none; }
+            }
+
+            @media (hover: hover) and (pointer: fine) {
+                .row-hover:hover { background: rgba(38, 49, 28, 0.03); }
+                .link-underline { background-size: 0% 1px; }
+                .link-underline:hover { background-size: 100% 1px; }
+            }
+            .link-underline {
+                background-image: linear-gradient(currentColor, currentColor);
+                background-position: 0 100%;
+                background-repeat: no-repeat;
+                transition: background-size 220ms var(--ease-out);
             }
         </style>
     </head>
-    <body class="bg-gray-900 text-gray-100 antialiased">
+    <body class="antialiased">
 
-        <!-- Header -->
-        <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" x-data="{ scrolled: false, mobileMenuOpen: false }"
-                @scroll.window="scrolled = window.pageYOffset > 50"
-                :class="scrolled ? 'bg-gray-900/95 backdrop-blur-xl shadow-lg border-b border-gray-800' : 'bg-transparent'">
-            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div class="flex items-center justify-between">
-                    <!-- Logo -->
-                    <a href="/" class="flex items-center gap-3 group">
-                        <div class="relative">
-                            <img src="{{ asset('images/logo.png') }}" alt="Dot.Farms" class="h-14 w-auto transform group-hover:scale-105 transition-transform duration-300">
-                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                        </div>
-                        <p class="hidden sm:block text-xs text-emerald-400 font-medium border-l border-gray-700 pl-3">Agriculture ERP</p>
-                    </a>
+        <!-- Nav -->
+        <header
+            x-data="{ scrolled: false, mobileMenuOpen: false }"
+            @scroll.window="scrolled = window.pageYOffset > 24"
+            :class="scrolled ? 'bg-[#f7f2e3]/95 backdrop-blur-md border-b border-[var(--line)]' : 'border-b border-transparent'"
+            class="fixed top-0 left-0 right-0 z-50 transition-colors duration-300"
+        >
+            <nav class="max-w-[1400px] mx-auto px-5 sm:px-8 py-3 flex items-center justify-between">
+                <a href="/" class="flex items-center gap-2.5 press">
+                    <img src="{{ asset('images/logo.png') }}" alt="Dot.Farms" class="h-16 sm:h-20 w-auto">
+                </a>
 
-                    <!-- Desktop Navigation -->
-                    <div class="hidden md:flex items-center gap-8">
-                        <a href="#features" class="text-gray-300 hover:text-emerald-400 transition-colors font-medium">Features</a>
-                        <a href="#lifecycle" class="text-gray-300 hover:text-emerald-400 transition-colors font-medium">Crop Lifecycle</a>
-                    </div>
-
-                    <!-- Auth Links -->
-                    @if (Route::has('login'))
-                        <div class="flex items-center gap-3">
-                            @auth
-                                <a href="{{ url('/dashboard') }}" class="hidden sm:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/30 transform hover:scale-105">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                                    </svg>
-                                    <span>Dashboard</span>
-                                </a>
-                            @else
-                                <a href="{{ route('login') }}" class="hidden sm:block px-4 py-2 text-gray-300 hover:text-white transition-colors font-medium">
-                                    Sign In
-                                </a>
-                                @if (Route::has('register'))
-                                    <a href="{{ route('register') }}" class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/30 transform hover:scale-105">
-                                        <span>Get Started</span>
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                                        </svg>
-                                    </a>
-                                @endif
-                            @endauth
-
-                            <!-- Mobile menu button -->
-                            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-gray-400 hover:text-white">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                                    <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    @endif
+                <div class="hidden md:flex items-center gap-8 font-mono text-[13px] tracking-wide uppercase text-[var(--ink-soft)]">
+                    <a href="#lifecycle" class="link-underline hover:text-[var(--ink)] pb-0.5">Lifecycle</a>
+                    <a href="#features" class="link-underline hover:text-[var(--ink)] pb-0.5">Features</a>
                 </div>
 
-                <!-- Mobile Menu -->
-                <div x-show="mobileMenuOpen"
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 transform scale-95"
-                     x-transition:enter-end="opacity-100 transform scale-100"
-                     x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100 transform scale-100"
-                     x-transition:leave-end="opacity-0 transform scale-95"
-                     class="md:hidden mt-4 py-4 border-t border-gray-800"
-                     style="display: none;">
-                    <div class="flex flex-col gap-2">
-                        <a href="#features" class="px-4 py-2 text-gray-300 hover:text-emerald-400 hover:bg-gray-800 rounded-lg transition-colors">Features</a>
-                        <a href="#lifecycle" class="px-4 py-2 text-gray-300 hover:text-emerald-400 hover:bg-gray-800 rounded-lg transition-colors">Crop Lifecycle</a>
-                        @guest
-                            <a href="{{ route('login') }}" class="px-4 py-2 text-gray-300 hover:text-emerald-400 hover:bg-gray-800 rounded-lg transition-colors">Sign In</a>
-                        @endguest
+                @if (Route::has('login'))
+                    <div class="flex items-center gap-3">
+                        @auth
+                            <a href="{{ url('/dashboard') }}" class="press flex items-center gap-2 px-5 py-2.5 bg-[var(--forest)] hover:bg-[var(--forest-deep)] text-[var(--paper)] text-sm font-display font-semibold rounded-lg transition-colors">
+                                Dashboard
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="hidden sm:block text-sm font-medium text-[var(--ink-soft)] hover:text-[var(--ink)] transition-colors">
+                                Sign in
+                            </a>
+                            @if (Route::has('register'))
+                                <a href="{{ route('register') }}" class="press px-5 py-2.5 bg-[var(--forest)] hover:bg-[var(--forest-deep)] text-[var(--paper)] text-sm font-display font-semibold rounded-lg transition-colors">
+                                    Create account
+                                </a>
+                            @endif
+                        @endauth
+
+                        <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden press p-2 -mr-2 text-[var(--ink)]" aria-label="Toggle menu">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 7h16M4 12h16M4 17h16"></path>
+                                <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
                     </div>
-                </div>
+                @endif
             </nav>
+
+            <div x-show="mobileMenuOpen"
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-100"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="md:hidden border-t border-[var(--line)] bg-[var(--paper)]"
+                 style="display: none;">
+                <div class="flex flex-col px-5 py-4 gap-1 font-mono text-sm uppercase tracking-wide">
+                    <a href="#lifecycle" class="px-3 py-2.5 text-[var(--ink-soft)] hover:text-[var(--ink)]">Lifecycle</a>
+                    <a href="#features" class="px-3 py-2.5 text-[var(--ink-soft)] hover:text-[var(--ink)]">Features</a>
+                    @guest
+                        <a href="{{ route('login') }}" class="px-3 py-2.5 text-[var(--ink-soft)] hover:text-[var(--ink)]">Sign in</a>
+                    @endguest
+                </div>
+            </div>
         </header>
 
-        <!-- Hero Section -->
-        <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-            <!-- Photographic Background: real aerial crop-field-rows photo by RECEP TİRYAKİ (@receqtryaki), unsplash.com/photos/an-aerial-view-of-a-farm-field-with-rows-of-crops-ATspM7IEDoI -->
+        <!-- Hero -->
+        <section class="relative min-h-[100dvh] flex items-end overflow-hidden">
+            <!-- Photo: aerial crop-field-rows, by RECEP TİRYAKİ, unsplash.com/photos/an-aerial-view-of-a-farm-field-with-rows-of-crops-ATspM7IEDoI -->
             <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1729113707537-8c054ba97650?q=80&w=2400&auto=format&fit=crop');"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/85 to-gray-900/60"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/40 to-transparent"></div>
+            <!-- Wide screens: soft vertical grounding + diagonal reveal keeps most of the photo visible, text sits in the opaque left band -->
+            <div class="absolute inset-0 hidden lg:block" style="background: linear-gradient(180deg, rgba(38,49,28,0.4) 0%, rgba(38,49,28,0.6) 45%, #f7f2e3 94%);"></div>
+            <div class="absolute inset-0 hidden lg:block" style="background: linear-gradient(90deg, #f7f2e3 0%, rgba(247,242,227,0.72) 32%, transparent 62%);"></div>
+            <!-- Narrow screens: text spans nearly the full width, so it needs a strong uniform scrim (no dark wash) for reliable contrast -->
+            <div class="absolute inset-0 lg:hidden" style="background: linear-gradient(180deg, rgba(247,242,227,0.88) 0%, rgba(247,242,227,0.88) 55%, #f7f2e3 100%);"></div>
 
-            <!-- Floating Elements -->
-            <div class="absolute top-20 left-10 w-64 h-64 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation"></div>
-            <div class="absolute bottom-20 right-10 w-96 h-96 bg-amber-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 float-animation" style="animation-delay: 2s;"></div>
+            <!-- Furrow rows — line-art nod to the plowed-field icon in the Dot.Farms mark -->
+            <svg class="hidden lg:block absolute right-[4%] bottom-0 h-[70%] w-auto opacity-[0.16] pointer-events-none" viewBox="0 0 260 300" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M10 300L130 190L250 300" stroke="#26311c" stroke-width="2.5"/>
+                <path d="M35 300L130 215L225 300" stroke="#26311c" stroke-width="2.5"/>
+                <path d="M60 300L130 240L200 300" stroke="#26311c" stroke-width="2.5"/>
+                <path d="M85 300L130 265L175 300" stroke="#26311c" stroke-width="2.5"/>
+                <path d="M130 190V60" stroke="#26311c" stroke-width="2.5"/>
+                <path d="M130 60C112 60 98 46 98 28" stroke="#26311c" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M130 100C148 100 162 86 162 68" stroke="#26311c" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M85 190V115" stroke="#26311c" stroke-width="1.5"/>
+                <path d="M85 115C71 115 60 104 60 90" stroke="#26311c" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M175 190V125" stroke="#26311c" stroke-width="1.5"/>
+                <path d="M175 125C189 125 200 114 200 100" stroke="#26311c" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
 
-            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                <div class="max-w-3xl space-y-8 slide-in-up">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-sm font-medium">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        <span>Agriculture System of Record</span>
-                    </div>
-
-                    <h2 class="text-5xl lg:text-7xl font-bold leading-tight">
-                        <span class="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">Own the Field,</span><br>
-                        <span class="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 bg-clip-text text-transparent">Paddock to Gate</span>
-                    </h2>
-
-                    <p class="text-xl text-gray-300 leading-relaxed max-w-xl">
-                        Plan crop cycles, log planting and harvest events, and track yield across every field and season. Built for farm owners, agronomists, and field operators who need one system of record for what actually happens on the farm.
+            <div class="relative z-10 max-w-[1400px] mx-auto px-5 sm:px-8 pt-32 pb-16 sm:pb-20 w-full">
+                <div class="max-w-2xl reveal" data-reveal>
+                    <p class="font-mono text-xs tracking-[0.18em] uppercase text-[var(--soil)] mb-6">
+                        Agriculture ERP
                     </p>
 
-                    <!-- Key Stats -->
-                    <div class="grid grid-cols-3 gap-6 py-6">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">Farm →</div>
-                            <div class="text-sm text-gray-400">Field → Cycle</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">Plant →</div>
-                            <div class="text-sm text-gray-400">Grow → Harvest</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-white mb-1">Season</div>
-                            <div class="text-sm text-gray-400">Yield Tracking</div>
-                        </div>
-                    </div>
+                    <h1 class="font-display font-semibold text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-[var(--ink)] mb-6">
+                        Own the field.<br>Not the sale.
+                    </h1>
+
+                    <p class="text-lg text-[var(--ink-soft)] leading-relaxed max-w-xl mb-10">
+                        Dot.Farms is the system of record for what happens on the farm — crop planning, planting and harvest execution, and yield tracking, from paddock to gate. The moment produce is harvest-ready, the commercial lifecycle hands off downstream.
+                    </p>
 
                     @guest
-                        <div class="flex flex-wrap gap-4">
-                            <a href="{{ route('register') }}" class="group flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-gray-900 font-bold rounded-xl transition-all duration-300 shadow-2xl shadow-emerald-500/30 transform hover:scale-105">
-                                <span>Get Started</span>
-                                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                                </svg>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <a href="{{ route('register') }}" class="press px-7 py-3.5 bg-[var(--forest)] hover:bg-[var(--forest-deep)] text-[var(--paper)] font-display font-semibold rounded-lg transition-colors">
+                                Create account
                             </a>
-                            <a href="{{ route('login') }}" class="flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl transition-all duration-300 border border-gray-700 hover:border-gray-600">
-                                <span>Sign In</span>
+                            <a href="#features" class="press flex items-center gap-2 px-7 py-3.5 text-[var(--ink)] font-medium rounded-lg border border-[var(--line)] hover:border-[var(--soil)] transition-colors">
+                                See what it tracks
                             </a>
                         </div>
                     @else
-                        <div class="flex flex-wrap gap-4">
-                            <a href="{{ url('/dashboard') }}" class="group flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-gray-900 font-bold rounded-xl transition-all duration-300 shadow-2xl shadow-emerald-500/30 transform hover:scale-105">
-                                <span>Go to Dashboard</span>
-                                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                                </svg>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <a href="{{ url('/dashboard') }}" class="press px-7 py-3.5 bg-[var(--forest)] hover:bg-[var(--forest-deep)] text-[var(--paper)] font-display font-semibold rounded-lg transition-colors">
+                                Go to dashboard
                             </a>
                         </div>
                     @endguest
                 </div>
             </div>
+
+            <!-- Domain strip — the real entity chain, not a fabricated metric -->
+            <div class="relative z-10 w-full border-t border-[var(--line)] bg-[var(--paper)]/70 backdrop-blur-sm">
+                <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-4 flex flex-wrap gap-x-8 gap-y-2 font-mono text-[11px] tracking-[0.14em] uppercase text-[var(--ink-soft)]">
+                    <span>Farm &amp; field registry</span>
+                    <span class="text-[var(--soil)]">·</span>
+                    <span>Crop cycles</span>
+                    <span class="text-[var(--soil)]">·</span>
+                    <span>Planting &amp; harvest logs</span>
+                    <span class="text-[var(--soil)]">·</span>
+                    <span>Season yield tracking</span>
+                </div>
+            </div>
         </section>
 
-        <!-- Features Section -->
-        <section id="features" class="py-24 px-4 sm:px-6 lg:px-8 bg-gray-900/50 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent"></div>
-
-            <div class="relative z-10 max-w-7xl mx-auto">
-                <div class="text-center mb-16">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-sm font-medium mb-6">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                        </svg>
-                        <span>Core Features</span>
-                    </div>
-                    <h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">
-                        Everything You Need to<br>
-                        <span class="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">Run the Farm</span>
+        <!-- Lifecycle -->
+        <section id="lifecycle" class="py-24 sm:py-28 px-5 sm:px-8">
+            <div class="max-w-[1400px] mx-auto">
+                <div class="max-w-xl mb-16 reveal" data-reveal>
+                    <p class="font-mono text-xs tracking-[0.18em] uppercase text-[var(--soil)] mb-4">Paddock to gate</p>
+                    <h2 class="font-display font-semibold text-3xl sm:text-4xl text-[var(--ink)] leading-tight">
+                        One system, the whole growing season
                     </h2>
-                    <p class="text-xl text-gray-400 max-w-3xl mx-auto">
-                        Purpose-built tools for the agriculture domain — from farm and field registry to season-by-season yield history
-                    </p>
                 </div>
 
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Feature 1 -->
-                    <div class="group bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 transform hover:-translate-y-2">
-                        <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-emerald-500/30">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-                            </svg>
+                <div class="grid md:grid-cols-2 border-t border-[var(--line)]">
+                    @php
+                        $lifecycle = [
+                            ['tag' => '01 · Plan', 'title' => 'Set up the crop cycle', 'body' => 'Register the field, season, and crop against a team-owned crop catalog reused across cycles and fields.'],
+                            ['tag' => '02 · Plant', 'title' => 'Log the planting event', 'body' => 'Record a planting record against the cycle as it happens in the field, not after the fact from memory.'],
+                            ['tag' => '03 · Grow', 'title' => 'Track cycle status', 'body' => 'A crop cycle moves through planned, planted, growing, harvested, or failed — visible for every field, every season.'],
+                            ['tag' => '04 · Harvest', 'title' => 'Record the yield', 'body' => 'A harvest record captures quantity harvested and marks the cycle complete — the ground-truth yield figure for the season.'],
+                        ];
+                    @endphp
+                    @foreach ($lifecycle as $i => $l)
+                        <div class="row-hover border-b border-[var(--line)] {{ $i % 2 === 0 ? 'md:border-r' : '' }} px-1 py-8 sm:py-10 transition-colors reveal" data-reveal>
+                            <p class="font-mono text-[11px] tracking-[0.14em] uppercase text-[var(--soil)] mb-3">{{ $l['tag'] }}</p>
+                            <h3 class="font-display font-semibold text-xl text-[var(--ink)] mb-2.5">{{ $l['title'] }}</h3>
+                            <p class="text-[var(--ink-soft)] leading-relaxed max-w-md">{{ $l['body'] }}</p>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">Farm & Field Registry</h3>
-                        <p class="text-gray-400 leading-relaxed">Register farms and fields, track soil type and moisture zone per paddock, and manage active, fallow, or retired status.</p>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section id="features" class="py-24 sm:py-28 px-5 sm:px-8 bg-[var(--paper-deep)] border-y border-[var(--line)]">
+            <div class="max-w-[1400px] mx-auto">
+                <div class="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-12 lg:gap-20">
+                    <div class="reveal" data-reveal>
+                        <p class="font-mono text-xs tracking-[0.18em] uppercase text-[var(--soil)] mb-4">What it does</p>
+                        <h2 class="font-display font-semibold text-3xl sm:text-4xl text-[var(--ink)] leading-tight mb-5">
+                            Built for farm owners, agronomists, and field operators
+                        </h2>
+                        <p class="text-[var(--ink-soft)] leading-relaxed max-w-sm">
+                            No hardware to install, no marketplace to opt into. Register a farm, add fields, and the rest of the platform is ready.
+                        </p>
                     </div>
 
-                    <!-- Feature 2 -->
-                    <div class="group bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 transform hover:-translate-y-2">
-                        <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-amber-500/30">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 8v2m0-10a9 9 0 100 18 9 9 0 000-18z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">Crop Cycle Planning</h3>
-                        <p class="text-gray-400 leading-relaxed">Plan the full planted → growing → harvested lifecycle per field, per season, with a team-owned crop catalog reused across cycles.</p>
-                    </div>
-
-                    <!-- Feature 3 -->
-                    <div class="group bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 transform hover:-translate-y-2">
-                        <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-500/30">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11H5a2 2 0 00-2 2v7a2 2 0 002 2h4m0-11v11m0-11h6m-6 11h6m0-11h4a2 2 0 012 2v7a2 2 0 01-2 2h-4m0-11v11"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">Planting & Harvest Logs</h3>
-                        <p class="text-gray-400 leading-relaxed">Record planting and harvest events as they happen in the field, building an operational log tied to each crop cycle.</p>
-                    </div>
-
-                    <!-- Feature 4 -->
-                    <div class="group bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 transform hover:-translate-y-2">
-                        <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-purple-500/30">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">Yield Tracking</h3>
-                        <p class="text-gray-400 leading-relaxed">Harvest records capture quantity harvested per cycle, giving you a season-by-season yield history for every field.</p>
-                    </div>
-
-                    <!-- Feature 5 -->
-                    <div class="group bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 transform hover:-translate-y-2">
-                        <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-red-500/30">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">Team-Scoped Access</h3>
-                        <p class="text-gray-400 leading-relaxed">Every farm, field, and record is scoped to the owning team, so multi-farm operations stay cleanly isolated from each other.</p>
-                    </div>
-
-                    <!-- Feature 6 -->
-                    <div class="group bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 transform hover:-translate-y-2">
-                        <div class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-cyan-500/30">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-3 group-hover:text-emerald-400 transition-colors">Operational Dashboard</h3>
-                        <p class="text-gray-400 leading-relaxed">A plain, outcome-anchored summary of active fields, crops currently in season, and recent harvests — no vanity metrics.</p>
+                    <div class="grid sm:grid-cols-2 gap-x-10">
+                        @php
+                            $features = [
+                                ['title' => 'Farm & field registry', 'body' => 'Register farms and fields, track soil type and moisture zone per paddock, and manage active, fallow, or retired status.'],
+                                ['title' => 'Crop catalog', 'body' => 'A team-owned catalog of crops and varieties, reused across every field and season instead of re-entered each cycle.'],
+                                ['title' => 'Planting & harvest logs', 'body' => 'Operational logs tied to each crop cycle, timestamped as planting and harvest events actually happen.'],
+                                ['title' => 'Season-by-season yield', 'body' => 'Harvest records build a yield history per field, so you can see what a season actually produced.'],
+                                ['title' => 'Team-scoped tenancy', 'body' => 'Every farm, field, and record is scoped to the owning team, enforced at the policy layer, not just the UI.'],
+                                ['title' => 'Outcome-anchored dashboard', 'body' => 'A plain operational summary — active fields, crops in season, recent harvests. No streaks, no vanity metrics.'],
+                            ];
+                        @endphp
+                        @foreach ($features as $f)
+                            <div class="py-6 border-t border-[var(--line)] reveal" data-reveal>
+                                <h3 class="font-display font-medium text-base text-[var(--ink)] mb-1.5">{{ $f['title'] }}</h3>
+                                <p class="text-sm text-[var(--ink-soft)] leading-relaxed">{{ $f['body'] }}</p>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Crop Lifecycle Section -->
-        <section id="lifecycle" class="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"></div>
-
-            <div class="relative z-10 max-w-7xl mx-auto">
-                <div class="text-center mb-16">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-6">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                        <span>Paddock to Gate</span>
-                    </div>
-                    <h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">
-                        One System, the Whole<br>
-                        <span class="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">Growing Season</span>
-                    </h2>
-                    <p class="text-xl text-gray-400 max-w-3xl mx-auto">
-                        Dot.Farms is the system of record for what happens on the farm — not a marketplace. The moment produce is harvest-ready, the commercial lifecycle hands off downstream.
-                    </p>
-                </div>
-
-                <div class="grid md:grid-cols-4 gap-6">
-                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700 text-center">
-                        <div class="w-12 h-12 mx-auto bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-4 text-emerald-400 font-bold">1</div>
-                        <h3 class="text-white font-semibold mb-2">Plan</h3>
-                        <p class="text-sm text-gray-400">Set up the crop cycle for a field and season</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700 text-center">
-                        <div class="w-12 h-12 mx-auto bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-4 text-emerald-400 font-bold">2</div>
-                        <h3 class="text-white font-semibold mb-2">Plant</h3>
-                        <p class="text-sm text-gray-400">Log the planting event against the cycle</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700 text-center">
-                        <div class="w-12 h-12 mx-auto bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-4 text-emerald-400 font-bold">3</div>
-                        <h3 class="text-white font-semibold mb-2">Grow</h3>
-                        <p class="text-sm text-gray-400">Track cycle status through the season</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700 text-center">
-                        <div class="w-12 h-12 mx-auto bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center mb-4 text-emerald-400 font-bold">4</div>
-                        <h3 class="text-white font-semibold mb-2">Harvest</h3>
-                        <p class="text-sm text-gray-400">Record the yield and hand off downstream</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <!-- Photographic Background: real sunset-over-farm-field photo by Mihail Ilchov (@archange1michael), unsplash.com/photos/the-sun-is-setting-over-a-farm-field-p6LxxduM5x0 -->
+        <!-- CTA -->
+        <section class="relative py-28 sm:py-36 px-5 sm:px-8 overflow-hidden">
+            <!-- Photo: sunset over a farm field, by Mihail Ilchov, unsplash.com/photos/the-sun-is-setting-over-a-farm-field-p6LxxduM5x0 -->
             <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1700605201690-ab19ba4a4c61?q=80&w=2400&auto=format&fit=crop');"></div>
-            <div class="absolute inset-0 bg-gray-900/90"></div>
-            <div class="absolute inset-0 bg-gradient-to-br from-emerald-600/20 via-emerald-500/10 to-transparent"></div>
+            <div class="absolute inset-0" style="background: linear-gradient(180deg, #26311c 0%, rgba(38,49,28,0.82) 50%, #26311c 100%);"></div>
 
-            <div class="relative z-10 max-w-4xl mx-auto text-center">
-                <h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">
-                    Ready to Run Your<br>
-                    <span class="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">Growing Season?</span>
+            <div class="relative z-10 max-w-2xl mx-auto text-center reveal" data-reveal>
+                <h2 class="font-display font-semibold text-3xl sm:text-4xl text-[var(--paper)] leading-tight mb-5">
+                    Run the season the way your team already tracks it
                 </h2>
-                <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+                <p class="text-[var(--paper-deep)] leading-relaxed mb-10 max-w-lg mx-auto opacity-90">
                     Register your farm, add your fields, and start logging crop cycles from planting through harvest.
                 </p>
 
                 @guest
                     <div class="flex flex-wrap justify-center gap-4">
-                        <a href="{{ route('register') }}" class="group flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-gray-900 font-bold rounded-xl transition-all duration-300 shadow-2xl shadow-emerald-500/30 transform hover:scale-105">
-                            <span>Get Started</span>
-                            <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                            </svg>
+                        <a href="{{ route('register') }}" class="press px-8 py-3.5 bg-[var(--gold)] hover:bg-[var(--gold-soft)] text-[var(--ink)] font-display font-semibold rounded-lg transition-colors">
+                            Create account
                         </a>
-                        <a href="{{ route('login') }}" class="flex items-center gap-2 px-10 py-4 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl transition-all duration-300 border border-gray-700 hover:border-gray-600">
-                            <span>Sign In</span>
+                        <a href="{{ route('login') }}" class="press px-8 py-3.5 text-[var(--paper)] font-medium rounded-lg border border-[rgba(247,242,227,0.28)] hover:border-[rgba(247,242,227,0.5)] transition-colors">
+                            Sign in
                         </a>
                     </div>
                 @endguest
@@ -355,21 +298,31 @@
         </section>
 
         <!-- Footer -->
-        <footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-800 bg-gray-900/50">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div class="flex flex-col items-center md:items-start">
-                        <img src="{{ asset('images/logo.png') }}" alt="Dot.Farms" class="h-12 w-auto mb-3">
-                        <p class="text-gray-400 text-sm text-center md:text-left">
-                            The agriculture system of record for the Dot Ecosystem.
-                        </p>
-                    </div>
-                    <p class="text-gray-400 text-sm">
-                        &copy; {{ date('Y') }} Dot.Farms. All rights reserved.
-                    </p>
-                </div>
+        <footer class="py-14 px-5 sm:px-8 border-t border-[var(--line)]">
+            <div class="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+                <a href="/" class="flex items-center gap-2.5">
+                    <img src="{{ asset('images/logo.png') }}" alt="Dot.Farms" class="h-11 w-auto opacity-90">
+                </a>
+                <p class="font-mono text-xs tracking-wide text-[var(--ink-soft)]">
+                    &copy; {{ date('Y') }} Dot.Farms. Agriculture ERP for the Dot Ecosystem.
+                </p>
             </div>
         </footer>
 
+        <script>
+            if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window) {
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            io.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+                document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el));
+            } else {
+                document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible'));
+            }
+        </script>
     </body>
 </html>
