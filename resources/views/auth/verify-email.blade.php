@@ -4,7 +4,12 @@
             <x-authentication-card-logo />
         </x-slot>
 
-        <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+        <div class="mb-6">
+            <p class="font-mono text-[11px] tracking-[0.14em] uppercase text-[var(--soil)] dark:text-gray-500 mb-1.5">Dot.Farms</p>
+            <h1 class="font-display font-semibold text-2xl text-[var(--ink)] dark:text-gray-100">Verify your email</h1>
+        </div>
+
+        <div class="mb-4 text-sm text-[var(--ink-soft)] dark:text-gray-400">
             {{ __('Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
         </div>
 
@@ -28,14 +33,14 @@
             <div>
                 <a
                     href="{{ route('profile.show') }}"
-                    class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                    class="text-sm text-[var(--ink-soft)] dark:text-gray-400 hover:text-[var(--forest)] dark:hover:text-[var(--gold)] underline rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors"
                 >
                     {{ __('Edit Profile') }}</a>
 
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
 
-                    <button type="submit" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 ms-2">
+                    <button type="submit" class="text-sm text-[var(--ink-soft)] dark:text-gray-400 hover:text-[var(--forest)] dark:hover:text-[var(--gold)] underline rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors ms-2">
                         {{ __('Log Out') }}
                     </button>
                 </form>
