@@ -5,8 +5,8 @@
         </x-slot>
 
         <div class="mb-6">
-            <p class="font-mono text-[11px] tracking-[0.14em] uppercase text-[var(--soil)] dark:text-gray-500 mb-1.5">Dot.Farms</p>
-            <h1 class="font-display font-semibold text-2xl text-[var(--ink)] dark:text-gray-100">Create your account</h1>
+            <p class="font-mono text-[11px] tracking-[0.14em] uppercase text-[var(--soil)] mb-1.5">Dot.Farms</p>
+            <h1 class="font-display font-semibold text-2xl text-[var(--ink)]">Create your account</h1>
         </div>
 
         <x-validation-errors class="mb-4" />
@@ -42,8 +42,8 @@
 
                             <div class="ms-2">
                                 {!! __('I agree to the :terms_of_service and :privacy_policy', [
-                                        'terms_of_service' => '<a target="_blank" href="'.route('terms.show').'" class="text-sm text-[var(--ink-soft)] dark:text-gray-400 hover:text-[var(--forest)] dark:hover:text-[var(--gold)] underline rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors">'.__('Terms of Service').'</a>',
-                                        'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="text-sm text-[var(--ink-soft)] dark:text-gray-400 hover:text-[var(--forest)] dark:hover:text-[var(--gold)] underline rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors">'.__('Privacy Policy').'</a>',
+                                        'terms_of_service' => '<a target="_blank" href="'.route('terms.show').'" class="text-sm text-[var(--ink-soft)] hover:text-[var(--forest)] underline rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:ring-offset-2 transition-colors">'.__('Terms of Service').'</a>',
+                                        'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="text-sm text-[var(--ink-soft)] hover:text-[var(--forest)] underline rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:ring-offset-2 transition-colors">'.__('Privacy Policy').'</a>',
                                 ]) !!}
                             </div>
                         </div>
@@ -52,7 +52,7 @@
             @endif
 
             <div class="flex items-center justify-end mt-4">
-                <a class="text-sm text-[var(--ink-soft)] dark:text-gray-400 hover:text-[var(--forest)] dark:hover:text-[var(--gold)] underline rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors" href="{{ route('login') }}">
+                <a class="text-sm text-[var(--ink-soft)] hover:text-[var(--forest)] underline rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold)] focus:ring-offset-2 transition-colors" href="{{ route('login') }}">
                     {{ __('Already registered?') }}
                 </a>
 

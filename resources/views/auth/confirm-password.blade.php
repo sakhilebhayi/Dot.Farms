@@ -5,11 +5,11 @@
         </x-slot>
 
         <div class="mb-6">
-            <p class="font-mono text-[11px] tracking-[0.14em] uppercase text-[var(--soil)] dark:text-gray-500 mb-1.5">Dot.Farms</p>
-            <h1 class="font-display font-semibold text-2xl text-[var(--ink)] dark:text-gray-100">Confirm your password</h1>
+            <p class="font-mono text-[11px] tracking-[0.14em] uppercase text-[var(--soil)] mb-1.5">Dot.Farms</p>
+            <h1 class="font-display font-semibold text-2xl text-[var(--ink)]">Confirm your password</h1>
         </div>
 
-        <div class="mb-4 text-sm text-[var(--ink-soft)] dark:text-gray-400">
+        <div class="mb-4 text-sm text-[var(--ink-soft)]">
             {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
         </div>
 

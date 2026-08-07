@@ -46,29 +46,18 @@
             .font-mono { font-family: var(--font-mono); }
         </style>
 
-        <!-- Dark mode: apply persisted/system preference before paint to avoid a flash. -->
-        <script>
-            (function () {
-                const stored = localStorage.getItem('dot-theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (stored === 'dark' || (!stored && prefersDark)) {
-                    document.documentElement.classList.add('dark');
-                }
-            })();
-        </script>
     </head>
-    <body class="bg-[var(--paper)] dark:bg-gray-900">
-        <div class="font-['Karla'] text-[var(--ink)] dark:text-gray-100 antialiased bg-[var(--paper)] dark:bg-gray-900 min-h-screen">
-            <button
-                type="button"
-                onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('dot-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');"
-                class="fixed top-4 right-4 z-50 inline-flex items-center justify-center h-9 w-9 rounded-full border border-[var(--line)] dark:border-gray-700 bg-white dark:bg-gray-800 text-[var(--ink-soft)] dark:text-gray-300 hover:text-[var(--ink)] dark:hover:text-white transition"
-                title="Toggle dark mode"
-            >
-                <span class="dark:hidden">🌙</span>
-                <span class="hidden dark:inline">☀️</span>
-            </button>
-
+    <body class="bg-[var(--paper)]">
+        {{-- Single fixed brand theme (paper/ink/forest/gold), matching welcome.blade.php. The
+             dark-mode toggle previously here (button + persisted/system-preference script) is
+             removed: no page in this file family actually renders correctly in dark mode (the
+             wrapper's dark: classes were fixed to one deliberate light look during the ecosystem
+             standardization pass, but several of the auth pages' own content — e.g. login.blade.php's
+             "Sign in" heading — still had live dark:text-gray-100 variants with no matching dark
+             background once the toggle triggered, producing invisible text against a light backdrop
+             for any visitor with a dark-mode OS preference). Same convention as the marketing page:
+             one deliberate look, no toggle. --}}
+        <div class="font-['Karla'] text-[var(--ink)] antialiased bg-[var(--paper)] min-h-screen">
             {{ $slot }}
         </div>
 
