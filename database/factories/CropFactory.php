@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Crop;
 use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Crop>
+ * @extends Factory<Crop>
  */
 class CropFactory extends Factory
 {

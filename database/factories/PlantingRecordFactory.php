@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\CropCycle;
+use App\Models\PlantingRecord;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PlantingRecord>
+ * @extends Factory<PlantingRecord>
  */
 class PlantingRecordFactory extends Factory
 {

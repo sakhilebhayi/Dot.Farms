@@ -14,9 +14,7 @@ use Illuminate\Notifications\Notification;
  */
 class HarvestRecordedNotification extends Notification
 {
-    public function __construct(public HarvestRecord $harvestRecord)
-    {
-    }
+    public function __construct(public HarvestRecord $harvestRecord) {}
 
     /**
      * @return array<int, string>

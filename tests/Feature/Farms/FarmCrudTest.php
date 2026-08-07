@@ -3,6 +3,7 @@
 namespace Tests\Feature\Farms;
 
 use App\Models\Farm;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -54,7 +55,7 @@ class FarmCrudTest extends TestCase
         $user = User::factory()->withPersonalTeam()->create();
         $ownFarm = Farm::factory()->create(['team_id' => $user->currentTeam->id, 'name' => 'Own Farm']);
 
-        $otherTeam = \App\Models\Team::factory()->create();
+        $otherTeam = Team::factory()->create();
         Farm::factory()->create(['team_id' => $otherTeam->id, 'name' => 'Other Team Farm']);
 
         $this->actingAs($user)

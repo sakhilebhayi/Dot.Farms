@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Farms;
 
 use App\Http\Controllers\Controller;
 use App\Models\Crop;
+use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ class CropController extends Controller
      * at which point currentTeam is genuinely null. See wiki.md Change
      * Log 2026-08-04.
      */
-    private function resolveCurrentTeam(): ?\App\Models\Team
+    private function resolveCurrentTeam(): ?Team
     {
         return Auth::user()?->currentTeam;
     }

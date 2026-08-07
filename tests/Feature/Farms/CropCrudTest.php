@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Farms;
 
-use App\Models\Crop;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

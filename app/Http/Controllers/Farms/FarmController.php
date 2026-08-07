@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Farms;
 
 use App\Http\Controllers\Controller;
 use App\Models\Farm;
+use App\Models\HarvestRecord;
+use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +20,7 @@ class FarmController extends Controller
      * at which point currentTeam is genuinely null. See wiki.md Change
      * Log 2026-08-04.
      */
-    private function resolveCurrentTeam(): ?\App\Models\Team
+    private function resolveCurrentTeam(): ?Team
     {
         return Auth::user()?->currentTeam;
     }
@@ -76,7 +78,7 @@ class FarmController extends Controller
             $query->withCount('cropCycles')->orderBy('name');
         }]);
 
-        $recentHarvests = \App\Models\HarvestRecord::query()
+        $recentHarvests = HarvestRecord::query()
             ->whereHas('cropCycle.field', fn ($q) => $q->where('farm_id', $farm->id))
             ->with(['cropCycle.crop', 'cropCycle.field'])
             ->latest('harvested_at')
