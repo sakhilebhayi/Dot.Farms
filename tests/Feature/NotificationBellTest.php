@@ -9,7 +9,6 @@ use App\Models\Farm;
 use App\Models\Field;
 use App\Models\HarvestRecord;
 use App\Models\User;
-use App\Notifications\HarvestRecordedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -33,9 +32,7 @@ class NotificationBellTest extends TestCase
         $user = User::factory()->withPersonalTeam()->create();
         $team = $user->currentTeam;
 
-        $harvestRecord = $this->createHarvestRecord($team->id);
-
-        $user->notify(new HarvestRecordedNotification($harvestRecord));
+        $this->createHarvestRecord($team->id);
 
         $this->assertDatabaseCount('notifications', 1);
 
@@ -54,9 +51,7 @@ class NotificationBellTest extends TestCase
         $user = User::factory()->withPersonalTeam()->create();
         $team = $user->currentTeam;
 
-        $harvestRecord = $this->createHarvestRecord($team->id);
-
-        $user->notify(new HarvestRecordedNotification($harvestRecord));
+        $this->createHarvestRecord($team->id);
 
         Livewire::actingAs($user)
             ->test(NotificationBell::class)

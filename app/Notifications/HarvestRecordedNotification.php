@@ -7,10 +7,12 @@ use Illuminate\Notifications\Notification;
 
 /**
  * In-app (database channel only) notification for a newly recorded
- * harvest. Not yet wired to any automatic trigger — dispatch manually
- * via `$user->notify(new HarvestRecordedNotification($harvestRecord))`
- * until the `agriculture.harvest.recorded` event (wiki.md §5) is
- * actually published anywhere.
+ * harvest. Fired automatically for every member of the harvest's owning
+ * team by App\Observers\HarvestRecordObserver, registered against
+ * HarvestRecord in AppServiceProvider::boot(). The
+ * `agriculture.harvest.recorded` Knowledge Pack event (wiki.md §5) is
+ * still not published anywhere — this notification is purely in-app,
+ * not the cross-platform ecosystem integration.
  */
 class HarvestRecordedNotification extends Notification
 {
