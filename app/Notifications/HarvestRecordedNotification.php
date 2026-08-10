@@ -3,16 +3,21 @@
 namespace App\Notifications;
 
 use App\Models\HarvestRecord;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 /**
- * In-app (database channel only) notification for a newly recorded
- * harvest. Fired automatically for every member of the harvest's owning
- * team by App\Observers\HarvestRecordObserver, registered against
- * HarvestRecord in AppServiceProvider::boot(). The
- * `agriculture.harvest.recorded` Knowledge Pack event (wiki.md §5) is
- * still not published anywhere — this notification is purely in-app,
- * not the cross-platform ecosystem integration.
+ * In-app (database channel) notification for a newly recorded harvest.
+ * Fired automatically for every member of the harvest's owning team by
+ * App\Observers\HarvestRecordObserver, registered against HarvestRecord in
+ * AppServiceProvider::boot(). The `agriculture.harvest.recorded` Knowledge
+ * Pack event (wiki.md §5) is still not published anywhere — this
+ * notification is purely in-app, not the cross-platform ecosystem
+ * integration.
+ *
+ * Also broadcasts over Reverb so NotificationBell.php updates live instead
+ * of only on page load -- see routes/channels.php for the
+ * App.Models.User.{id} channel this uses.
  */
 class HarvestRecordedNotification extends Notification
 {
@@ -23,7 +28,12 @@ class HarvestRecordedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->toDatabase($notifiable));
     }
 
     /**
