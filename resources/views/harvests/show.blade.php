@@ -1,5 +1,5 @@
 <x-app-layout>
-<div style="padding:2rem 2.5rem 3rem;max-width:640px;">
+<div class="page-pad" style="padding:2rem 2.5rem 3rem;max-width:640px;">
     <div style="margin-bottom:1.5rem;">
         <a href="{{ route('harvests.index') }}" style="font-size:0.78rem;color:#71717a;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span>
@@ -22,7 +22,7 @@
     </div>
 
     <div class="dot-card" style="padding:1.5rem;">
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;">
+        <div class="r-stack" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;">
             <div>
                 <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:#52525b;margin-bottom:0.5rem;">Quantity Harvested</div>
                 <div class="metric-val" style="font-size:1.4rem;font-weight:700;color:var(--accent);">{{ number_format((float) $harvestRecord->quantity_harvested, 2) }} {{ $harvestRecord->unit }}</div>

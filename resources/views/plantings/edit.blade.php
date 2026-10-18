@@ -1,5 +1,5 @@
 <x-app-layout>
-<div style="padding:2rem 2.5rem 3rem;max-width:560px;">
+<div class="page-pad" style="padding:2rem 2.5rem 3rem;max-width:560px;">
     <div style="margin-bottom:1.5rem;">
         <a href="{{ route('crop-cycles.show', [$farm, $field, $cropCycle]) }}" style="font-size:0.78rem;color:#a1a1aa;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span>
@@ -15,7 +15,7 @@
         @csrf
         @method('PUT')
 
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+        <div class="r-stack" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
             <div>
                 <label for="planted_at" class="dot-label">Planted on</label>
                 <input id="planted_at" name="planted_at" type="date" class="dot-input" value="{{ old('planted_at', $plantingRecord->planted_at->toDateString()) }}" required>

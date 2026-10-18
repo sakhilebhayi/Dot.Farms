@@ -1,5 +1,5 @@
 <x-app-layout>
-<div style="padding:2rem 2.5rem 3rem;">
+<div class="page-pad" style="padding:2rem 2.5rem 3rem;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
         <div>
             <h1 style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:#f4f4f5;margin:0 0 0.2rem;letter-spacing:-0.01em;">Reports</h1>
@@ -44,7 +44,7 @@
             @forelse($yieldsBySeason as $seasonName => $rows)
                 <div class="dot-card" style="padding:0;margin-bottom:1rem;overflow:hidden;">
                     <div style="padding:0.85rem 1.1rem 0.5rem;"><span class="dot-kicker">{{ $seasonName }}</span></div>
-                    <div style="overflow-x:auto;">
+                    <div class="table-scroll" style="overflow-x:auto;">
                     <table class="dot-table" style="table-layout:fixed;min-width:760px;">
                         <colgroup><col style="width:22%"><col style="width:20%"><col style="width:12%"><col style="width:13%"><col style="width:17%"><col style="width:16%"></colgroup>
                         <thead>
@@ -98,7 +98,7 @@
                 <div class="dot-card" style="padding:1.5rem;"><p class="dot-muted" style="font-size:12.5px;margin:0;">No harvests recorded{{ $season ? " in {$season}" : '' }} yet. Totals by crop and month appear once a harvest is recorded on a planted cycle.</p></div>
             @else
                 <div class="dot-card" style="padding:0;overflow:hidden;">
-                    <div style="overflow-x:auto;">
+                    <div class="table-scroll" style="overflow-x:auto;">
                     <table class="dot-table">
                         <thead>
                             <tr><th>Month</th><th>Crop</th><th class="num">Harvested</th><th class="num">Records</th></tr>
@@ -127,7 +127,7 @@
                 <div class="dot-card" style="padding:1.5rem;"><p class="dot-muted" style="font-size:12.5px;margin:0;">Every cycle is closed. Nothing outstanding.</p></div>
             @else
                 <div class="dot-card" style="padding:0;overflow:hidden;">
-                    <div style="overflow-x:auto;">
+                    <div class="table-scroll" style="overflow-x:auto;">
                     <table class="dot-table">
                         <thead>
                             <tr><th>Cycle</th><th>Status</th><th>Planted</th><th>Expected harvest</th><th class="num">Harvested so far</th></tr>
