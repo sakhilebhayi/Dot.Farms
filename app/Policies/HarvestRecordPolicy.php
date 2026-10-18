@@ -47,6 +47,11 @@ class HarvestRecordPolicy
         return $this->canManage($user, $this->teamOfRecord($record));
     }
 
+    public function restore(User $user, HarvestRecord $record): bool
+    {
+        return $this->canManage($user, $this->teamOfRecord($record));
+    }
+
     private function teamOfRecord(HarvestRecord $record): ?Team
     {
         $cycle = CropCycle::withoutGlobalScopes()->find($record->crop_cycle_id);

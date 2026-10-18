@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\DB;
  * table queries (no model scopes, so no recursion) and refuse to pass through
  * a soft-deleted farm, field or cycle: a record under a deleted parent is
  * gone for every team-scoped query, even if a cascade somehow missed it.
+ *
+ * The Removed screen is the one caller that must see through deleted parents
+ * (a removed field under a removed farm is exactly what it lists), so each
+ * method takes $withTrashed. That drops only the deleted_at tests; the team
+ * condition on farms.team_id stays, so it can widen what a team sees of its
+ * own removed rows but never reach another team's.
  */
 final class TeamChain
 {
@@ -34,33 +40,30 @@ final class TeamChain
         return Auth::user()?->currentTeam?->id;
     }
 
-    public static function farmIds(int $teamId): Builder
+    public static function farmIds(int $teamId, bool $withTrashed = false): Builder
     {
         return DB::table('farms')
             ->select('farms.id')
             ->where('farms.team_id', $teamId)
-            ->whereNull('farms.deleted_at');
+            ->unless($withTrashed, fn (Builder $q) => $q->whereNull('farms.deleted_at'));
     }
 
-    public static function fieldIds(int $teamId): Builder
+    public static function fieldIds(int $teamId, bool $withTrashed = false): Builder
     {
         return DB::table('fields')
             ->join('farms', 'farms.id', '=', 'fields.farm_id')
             ->select('fields.id')
             ->where('farms.team_id', $teamId)
-            ->whereNull('farms.deleted_at')
-            ->whereNull('fields.deleted_at');
+            ->unless($withTrashed, fn (Builder $q) => $q->whereNull('farms.deleted_at')->whereNull('fields.deleted_at'));
     }
 
-    public static function cycleIds(int $teamId): Builder
+    public static function cycleIds(int $teamId, bool $withTrashed = false): Builder
     {
         return DB::table('crop_cycles')
             ->join('fields', 'fields.id', '=', 'crop_cycles.field_id')
             ->join('farms', 'farms.id', '=', 'fields.farm_id')
             ->select('crop_cycles.id')
             ->where('farms.team_id', $teamId)
-            ->whereNull('farms.deleted_at')
-            ->whereNull('fields.deleted_at')
-            ->whereNull('crop_cycles.deleted_at');
+            ->unless($withTrashed, fn (Builder $q) => $q->whereNull('farms.deleted_at')->whereNull('fields.deleted_at')->whereNull('crop_cycles.deleted_at'));
     }
 }

@@ -52,4 +52,9 @@ class CropCyclePolicy
     {
         return $this->canManage($user, $this->teamOfCycle($cycle));
     }
+
+    public function restore(User $user, CropCycle $cycle): bool
+    {
+        return $this->canManage($user, $this->teamOfCycle($cycle));
+    }
 }

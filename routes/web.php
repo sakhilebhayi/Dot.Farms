@@ -10,7 +10,9 @@ use App\Http\Controllers\Farms\FieldController;
 use App\Http\Controllers\Farms\HarvestExportController;
 use App\Http\Controllers\Farms\HarvestRecordController;
 use App\Http\Controllers\Farms\PlantingRecordController;
+use App\Http\Controllers\Farms\RemovedRecordController;
 use App\Http\Controllers\Farms\ReportController;
+use App\Support\Farms\RemovedLookup;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Laravel\Jetstream\Jetstream;
@@ -93,4 +95,11 @@ Route::middleware([
     Route::get('/harvests/{harvestRecord}/edit', [HarvestRecordController::class, 'edit'])->name('harvests.edit');
     Route::put('/harvests/{harvestRecord}', [HarvestRecordController::class, 'update'])->name('harvests.update');
     Route::delete('/harvests/{harvestRecord}', [HarvestRecordController::class, 'destroy'])->name('harvests.destroy');
+
+    // Removed records (soft-deleted farms, fields, crops, cycles, plantings, harvests): list and restore
+    Route::get('/removed', [RemovedRecordController::class, 'index'])->name('removed.index');
+    Route::post('/removed/{type}/{id}/restore', [RemovedRecordController::class, 'restore'])
+        ->whereIn('type', array_keys(RemovedLookup::TYPES))
+        ->whereNumber('id')
+        ->name('removed.restore');
 });

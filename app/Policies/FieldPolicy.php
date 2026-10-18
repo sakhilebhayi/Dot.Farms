@@ -31,4 +31,9 @@ class FieldPolicy
     {
         return $this->canManage($user, $this->teamOfField($field));
     }
+
+    public function restore(User $user, Field $field): bool
+    {
+        return $this->canManage($user, $this->teamOfField($field));
+    }
 }
