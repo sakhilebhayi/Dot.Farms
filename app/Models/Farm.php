@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Tenant root of the agriculture domain (wiki.md §4). Every field, crop
@@ -16,10 +17,14 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  *
  * HasTeamScope keeps every query against this table scoped to the
  * current team by default (see app/Models/Concerns/HasTeamScope.php).
+ *
+ * Deleting a farm is soft and cascades softly: its fields, their crop
+ * cycles and those cycles' planting/harvest records are soft-deleted in the
+ * same transaction the caller opened (see FarmController::destroy).
  */
 class Farm extends Model
 {
-    use HasFactory, HasTeamScope;
+    use HasFactory, HasTeamScope, SoftDeletes;
 
     protected $fillable = [
         'team_id',
@@ -33,6 +38,17 @@ class Farm extends Model
     protected $casts = [
         'size_hectares' => 'decimal:2',
     ];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Farm $farm): void {
+            if ($farm->isForceDeleting()) {
+                return;
+            }
+
+            $farm->fields()->withoutGlobalScope('team')->get()->each->delete();
+        });
+    }
 
     public function team(): BelongsTo
     {

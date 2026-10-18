@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Unit;
 use App\Models\CropCycle;
 use App\Models\HarvestRecord;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,7 +18,7 @@ class HarvestRecordFactory extends Factory
             'crop_cycle_id' => CropCycle::factory(),
             'harvested_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'quantity_harvested' => $this->faker->randomFloat(2, 100, 5000),
-            'unit' => $this->faker->randomElement(['kg', 'ton', 'crates']),
+            'unit' => $this->faker->randomElement(Unit::harvestValues()),
             'quality_grade' => $this->faker->randomElement(['A', 'B', 'C']),
             'notes' => null,
         ];
