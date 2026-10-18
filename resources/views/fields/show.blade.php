@@ -16,31 +16,31 @@
                 @if($field->size_hectares) · {{ number_format((float) $field->size_hectares, 1) }} ha @endif
             </p>
         </div>
-        <a href="{{ route('crop-cycles.create', [$farm, $field]) }}" class="dot-btn dot-btn-primary">
-            <span class="material-symbols-rounded" style="font-size:16px;">add</span>
-            Plan Crop Cycle
-        </a>
+        <div style="display:flex;gap:0.5rem;">
+            @can('update', $field)
+            <a href="{{ route('fields.edit', [$farm, $field]) }}" class="dot-btn dot-btn-ghost">Edit</a>
+            @endcan
+            @can('create', [\App\Models\CropCycle::class, $field])
+            <a href="{{ route('crop-cycles.create', [$farm, $field]) }}" class="dot-btn dot-btn-primary">
+                <span class="material-symbols-rounded" style="font-size:16px;">add</span>
+                Plan Crop Cycle
+            </a>
+            @endcan
+        </div>
     </div>
 
     <div class="dot-card" style="padding:1.5rem;">
+        <x-form-errors />
         <h3 style="font-family:'Syne',sans-serif;font-size:0.875rem;font-weight:700;color:#f4f4f5;margin:0 0 1.25rem;">Crop Cycles</h3>
 
         @if($field->cropCycles->isEmpty())
             <div style="text-align:center;padding:2rem 0;">
                 <span class="material-symbols-rounded" style="font-size:32px;color:#3f3f46;display:block;margin-bottom:0.5rem;">grass</span>
-                <p style="font-size:0.8rem;color:#52525b;margin:0;">No crop cycles planned for this field yet.</p>
+                <p style="font-size:0.8rem;color:#8b8b94;margin:0;">No crop cycles planned for this field yet.@can('create', [\App\Models\CropCycle::class, $field]) Use "Plan Crop Cycle" to start the first.@endcan</p>
             </div>
         @else
             <div style="display:grid;gap:0.5rem;">
                 @foreach($field->cropCycles as $cycle)
-                @php
-                    $statusColor = match($cycle->status) {
-                        'planted', 'growing' => '#f59e0b',
-                        'harvested' => '#22c55e',
-                        'failed' => '#ef4444',
-                        default => '#71717a',
-                    };
-                @endphp
                 <a href="{{ route('crop-cycles.show', [$farm, $field, $cycle]) }}" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;">
                     <div>
                         <div style="font-size:12.5px;font-weight:600;color:#d4d4d8;">{{ $cycle->crop->displayName() }} — {{ $cycle->season }}</div>
@@ -49,7 +49,7 @@
                             @if($cycle->expected_harvest_at) · expected harvest {{ $cycle->expected_harvest_at->format('M j, Y') }} @endif
                         </div>
                     </div>
-                    <span class="dot-badge" style="background:{{ $statusColor }}1a;color:{{ $statusColor }};">{{ ucfirst($cycle->status) }}</span>
+                    <x-status-badge :status="$cycle->status" />
                 </a>
                 @endforeach
             </div>

@@ -2,9 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\Unit;
+use App\Models\Concerns\HasTeamChainScope;
+use App\Support\Farms\TeamChain;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Operational log of a harvest event against a CropCycle (wiki.md §4:
@@ -17,10 +22,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * describe as handing off the commercial lifecycle to Dot.Emall /
  * Dot.Billing (`agriculture.harvest.recorded`). No outbound event is
  * actually published yet — that integration is future work.
+ *
+ * Create, edit and delete through CropCycleLifecycle so the cycle's status
+ * stays consistent with its records.
  */
 class HarvestRecord extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTeamChainScope, SoftDeletes;
 
     protected $fillable = [
         'crop_cycle_id',
@@ -36,8 +44,23 @@ class HarvestRecord extends Model
         'quantity_harvested' => 'decimal:2',
     ];
 
+    public function scopeForTeam(Builder $query, Team|int|null $team): Builder
+    {
+        $teamId = TeamChain::idOf($team);
+
+        return $teamId === null
+            ? $query->whereRaw('1 = 0')
+            : $query->whereIn('harvest_records.crop_cycle_id', TeamChain::cycleIds($teamId));
+    }
+
     public function cropCycle(): BelongsTo
     {
         return $this->belongsTo(CropCycle::class);
+    }
+
+    /** Null for a legacy free-text unit that is not in the standard list. */
+    public function unitEnum(): ?Unit
+    {
+        return Unit::tryFrom((string) $this->unit);
     }
 }

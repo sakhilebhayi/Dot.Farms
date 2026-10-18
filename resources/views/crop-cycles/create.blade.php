@@ -12,7 +12,11 @@
     @if($crops->isEmpty())
         <div class="dot-card" style="padding:1.5rem;">
             <p style="font-size:0.85rem;color:#a1a1aa;margin:0 0 1rem;">Your crop catalog is empty — add a crop before planning a cycle.</p>
-            <a href="{{ route('crops.create') }}" class="dot-btn dot-btn-primary">Add a crop</a>
+            @can('create', \App\Models\Crop::class)
+                <a href="{{ route('crops.create') }}" class="dot-btn dot-btn-primary">Add a crop</a>
+            @else
+                <p style="font-size:0.8rem;color:#8b8b94;margin:0;">Ask a team owner or admin to add the crop first.</p>
+            @endcan
         </div>
     @else
         <form method="POST" action="{{ route('crop-cycles.store', [$farm, $field]) }}" class="dot-card" style="padding:1.5rem;display:grid;gap:1rem;">

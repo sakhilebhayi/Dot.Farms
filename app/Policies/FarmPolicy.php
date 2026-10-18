@@ -4,19 +4,19 @@ namespace App\Policies;
 
 use App\Models\Farm;
 use App\Models\User;
+use App\Policies\Concerns\ChecksFarmRoles;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
- * Enforces the tenant boundary described in wiki.md §7: a user may only
- * view or manage a Farm (and, by extension, its fields, crop cycles,
- * planting records, and harvest records) if they belong to the Farm's
- * owning team. Modeled directly on Dot.Billing's BillingInvoicePolicy,
- * which was added there specifically to close a cross-team access gap —
- * applying the same check here from the start rather than adding it
- * after the fact.
+ * Enforces the tenant boundary described in wiki.md §7: a user may only view
+ * a Farm (and, by extension, its fields, crop cycles, planting records, and
+ * harvest records) if they belong to the Farm's owning team, and may only
+ * change the farm structure as team owner or admin. See ChecksFarmRoles for
+ * the full role table. Modeled on Dot.Billing's BillingInvoicePolicy.
  */
 class FarmPolicy
 {
+    use ChecksFarmRoles;
     use HandlesAuthorization;
 
     public function viewAny(User $user): bool
@@ -26,21 +26,21 @@ class FarmPolicy
 
     public function view(User $user, Farm $farm): bool
     {
-        return $user->belongsToTeam($farm->team);
+        return $this->isMember($user, $farm->team);
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $this->canManage($user, $this->currentTeam($user));
     }
 
     public function update(User $user, Farm $farm): bool
     {
-        return $user->belongsToTeam($farm->team);
+        return $this->canManage($user, $farm->team);
     }
 
     public function delete(User $user, Farm $farm): bool
     {
-        return $user->belongsToTeam($farm->team);
+        return $this->canManage($user, $farm->team);
     }
 }
