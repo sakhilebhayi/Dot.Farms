@@ -24,6 +24,10 @@ use Illuminate\Support\Facades\DB;
  *  - harvests are accepted only while planted/growing, and may be partial;
  *  - closing as harvested is an explicit action and needs at least one harvest;
  *  - failed/abandoned need a reason; closed cycles can be re-opened;
+ *  - restoring a removed planting or harvest goes back through the same rules
+ *    (a harvest needs an open or harvested cycle and must not predate the
+ *    planting; a planting must not postdate a harvest), and reconcile() re-derives
+ *    a restored cycle's facts from the records that are live again;
  *  - editing or deleting records re-derives the cycle's facts: deleting the
  *    last harvest of a harvested cycle re-opens it, deleting the only planting
  *    of a harvest-less cycle sends it back to planned, and no change may leave
@@ -73,6 +77,60 @@ class CropCycleLifecycle
 
             $this->assertPlantingPrecedesHarvests($cycle);
             $this->syncPlantingFacts($cycle);
+        });
+    }
+
+    /** Bring a removed planting back and re-derive the cycle's planting date and planned/planted state. */
+    public function restorePlanting(PlantingRecord $record): PlantingRecord
+    {
+        return $this->atomically($record->cropCycle, function (CropCycle $cycle) use ($record) {
+            $record->restore();
+            $this->assertPlantingPrecedesHarvests($cycle);
+            $this->syncPlantingFacts($cycle);
+
+            return $record;
+        });
+    }
+
+    /**
+     * Bring a removed harvest back. It never closes or opens the cycle: a harvested
+     * cycle stays harvested, an in-season one stays in season. A planned cycle has no
+     * planting to harvest from, and a failed or abandoned one has to be re-opened first.
+     */
+    public function restoreHarvest(HarvestRecord $record): HarvestRecord
+    {
+        return $this->atomically($record->cropCycle, function (CropCycle $cycle) use ($record) {
+            if ($cycle->status === Status::Planned) {
+                throw InvalidCycleTransition::because('This cycle has not been planted yet, so a harvest cannot be restored into it. Record a planting first.');
+            }
+
+            if ($cycle->status->isClosed() && $cycle->status !== Status::Harvested) {
+                throw InvalidCycleTransition::because("This cycle is {$cycle->status->value}, so a harvest cannot be restored into it. Re-open the cycle first.");
+            }
+
+            $this->assertHarvestNotBeforePlanting($cycle, $record->harvested_at);
+            $record->restore();
+
+            return $record;
+        });
+    }
+
+    /**
+     * Re-derive a cycle's facts from the records that are live now (used after a
+     * cycle and its records come back from removal): a cycle closed as harvested
+     * with no harvest is re-opened to the state its plantings support, and
+     * planted_at and the planned/planted pair follow the live plantings.
+     */
+    public function reconcile(CropCycle $cycle): CropCycle
+    {
+        return $this->atomically($cycle, function (CropCycle $cycle) {
+            if ($cycle->status === Status::Harvested && $cycle->harvestRecords()->doesntExist()) {
+                $this->applyStatus($cycle, $this->restingStatus($cycle));
+            }
+
+            $this->syncPlantingFacts($cycle);
+
+            return $cycle;
         });
     }
 

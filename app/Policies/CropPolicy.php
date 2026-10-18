@@ -36,4 +36,9 @@ class CropPolicy
     {
         return $this->canManage($user, Team::find($crop->team_id));
     }
+
+    public function restore(User $user, Crop $crop): bool
+    {
+        return $this->canManage($user, Team::find($crop->team_id));
+    }
 }

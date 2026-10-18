@@ -43,4 +43,10 @@ class FarmPolicy
     {
         return $this->canManage($user, $farm->team);
     }
+
+    /** Bringing a removed farm back is a management act, like removing it. */
+    public function restore(User $user, Farm $farm): bool
+    {
+        return $this->canManage($user, $farm->team);
+    }
 }

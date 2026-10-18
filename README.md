@@ -50,13 +50,14 @@ harvest-ready. See `wiki.md` for the full platform description.
 
 **Access**
 - Team owner and `admin`: everything. `editor`: plan and edit cycles, move them through their lifecycle, record and correct plantings and harvests; cannot delete anything or change farms, fields and crops. Any other member: read-only. The full table is in `app/Policies/Concerns/ChecksFarmRoles.php`.
+- Restoring removed records (see **Removed records** below) is owner and admin only, like deleting.
 - Every query for fields, cycles and records is scoped to the signed-in user's current team through the farm they belong to (`forTeam()`), failing closed: no current team, no rows. Console commands and queued jobs have no signed-in user and must scope explicitly with `forTeam($team)`.
 
 **Platform**
 - In-app notification bell (Laravel's `database` channel, live over Reverb), sent after the harvest transaction commits
 - Ecosystem SSO sign-in through InfoDot
 
-Not built: yield forecasting, weather integration, moisture/sensor telemetry, record restore (deletes are soft but there is no undelete screen), outbound event publishing to Dot.Brain/Dot.Emall (the domain models describe the trigger points; nothing fires yet).
+Not built: yield forecasting, weather integration, moisture/sensor telemetry, outbound event publishing to Dot.Brain/Dot.Emall (the domain models describe the trigger points; nothing fires yet).
 
 ## Roles
 
@@ -64,7 +65,7 @@ Access follows the team (company) role. InfoDot is the source of truth and the r
 
 | InfoDot role | Dot.Farms role | Can |
 |---|---|---|
-| owner, admin | admin (owner for the creator) | everything: farms, fields and crops; delete cycles, plantings and harvests |
+| owner, admin | admin (owner for the creator) | everything: farms, fields and crops; delete cycles, plantings and harvests; restore anything removed |
 | editor | editor | run the season: plan and edit crop cycles, move them through their lifecycle, record and correct plantings and harvests; read and export |
 | viewer | viewer | read only: farms, fields, crops, cycles, harvests and the reports, and the harvest CSV export, exactly the read surface an editor has; no write control is shown and every write route answers 403 |
 | anything else | viewer | an unrecognised InfoDot role gets the least powerful role, never editor |
@@ -177,6 +178,24 @@ No farm, field or crop names, notes, quality grades or any other row data are se
 - Safe to repeat: `taken_at` is the start of the UTC day, and Analytics treats the same company, platform, `taken_at` and period as one snapshot, so a re-run or a retry the same day cannot double count.
 - Analytics can never break or slow this app: 5 second timeout, no redirects followed, 3 tries with backoff (60 s, then 5 min), every failure caught and logged without the body or the secret, and after 5 failures in a row calls pause for 60 seconds (a cache-based circuit breaker). A snapshot that cannot be delivered is simply replaced by the next day's.
 - Requests are signed with HMAC-SHA256 over `"{timestamp}.{raw body}"` (`X-InfoDot-Timestamp`, `X-InfoDot-Signature: sha256=<hex>`), made at send time so a retry carries a fresh timestamp.
+
+## Removed records
+
+Deleting a farm, field, crop, crop cycle, planting or harvest record is soft: the row stays, marked deleted. **Removed** in the sidebar (`/removed`) lists everything the current company has deleted, newest first, with a type filter, a search box and pagination. The list shows when each record was removed; it does not show who removed it, because nothing records that (only `deleted_at` exists).
+
+**Restoring** (owner and admin only; editors and viewers see the list but no Restore control, and the route answers 403):
+
+- A record cannot come back while something above it is still removed: a field needs its farm, a crop cycle its field (and its crop), a planting or harvest its crop cycle. The screen names the topmost removed ancestor ("Restore the farm Kopje Home Farm first") and the restore is refused with the same message if forced.
+- Restoring a farm, field or crop cycle also brings back what was removed in the same delete: its descendants whose removal time is within 5 seconds of its own, which is how a delete cascade stamps them. Something deleted on its own earlier stays removed and is restored separately. A crop cycle whose crop has since been removed is left removed and the message says so.
+- A restored field is refused if a live field on the same farm has taken its code since.
+- Facts are re-derived through `CropCycleLifecycle`, not copied back: a restored cycle's planting date and planned/planted state follow its live plantings, a cycle closed as harvested with no harvest left is re-opened; a restored planting or harvest passes the same date rules as a new one (a harvest cannot predate the planting) and a harvest is refused on a planned, failed or abandoned cycle (record a planting, or re-open it, first). A restored harvest never closes the cycle and does not send the harvest notification again. Restored harvests count in the unit-family totals again (kg and t together, every other unit on its own).
+- Each restore writes one row to `record_restorations` (company, user, record type and id, a name snapshot, how many records came back with it). The table is append-only: the model refuses to update or delete a row.
+
+**Permanent deletion.** There is no button for it. The scheduler runs `php artisan farms:purge-removed` daily at 03:10 UTC; it hard-deletes records removed more than `REMOVED_RETENTION_DAYS` days ago (default 90, minimum 1; the command refuses to run with less).
+
+- Children go with their parent: a farm, field or cycle past retention is purged only when nothing live is left anywhere beneath it, and its removed descendants are deleted with it whatever their own age. A removed crop is purged only when no crop cycle, live or removed, still names it. Live rows are never touched.
+- `--dry-run` reports exactly what a real run would delete (it executes the deletes in a transaction and rolls it back) and changes nothing. Running it twice deletes nothing the second time. Each run logs one `farms.purge-removed` line with the cutoff and the counts per table.
+- The scheduler must be running (`* * * * * php artisan schedule:run`); set `REMOVED_RETENTION_DAYS` in `.env` to change the window. `record_restorations` rows are kept.
 
 ## Ecosystem
 

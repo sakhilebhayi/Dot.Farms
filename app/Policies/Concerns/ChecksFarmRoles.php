@@ -14,7 +14,8 @@ use App\Models\User;
  * Roles are Jetstream's team roles. The team owner always counts as `admin`.
  *
  *   manage  (owner, admin)  create / edit / delete farms, fields and crops;
- *                           delete cycles, plantings and harvests
+ *                           delete cycles, plantings and harvests; restore any of
+ *                           them from the Removed screen
  *   operate (+ editor)      plan and edit crop cycles, move them through their
  *                           lifecycle, record and correct plantings and harvests
  *   read    (any member)    view everything and export harvests; this is the

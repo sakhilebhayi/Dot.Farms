@@ -28,6 +28,11 @@ class PlantingRecordPolicy
         return $this->canManage($user, $this->teamOfRecord($record));
     }
 
+    public function restore(User $user, PlantingRecord $record): bool
+    {
+        return $this->canManage($user, $this->teamOfRecord($record));
+    }
+
     private function teamOfRecord(PlantingRecord $record): ?Team
     {
         $cycle = CropCycle::withoutGlobalScopes()->find($record->crop_cycle_id);
