@@ -1,5 +1,5 @@
 <x-app-layout>
-<div style="padding:2rem 2.5rem 3rem;max-width:560px;">
+<div class="page-pad" style="padding:2rem 2.5rem 3rem;max-width:560px;">
     <div style="margin-bottom:1.5rem;">
         <a href="{{ route('farms.show', $farm) }}" style="font-size:0.78rem;color:#71717a;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span>
@@ -12,7 +12,7 @@
     <form method="POST" action="{{ route('fields.store', $farm) }}" class="dot-card" style="padding:1.5rem;display:grid;gap:1rem;">
         @csrf
 
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;">
+        <div class="r-stack" style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;">
             <div>
                 <label for="name" style="display:block;font-size:12px;font-weight:600;color:#a1a1aa;margin-bottom:0.35rem;">Field name</label>
                 <input id="name" name="name" type="text" class="dot-input" value="{{ old('name') }}" required autofocus>
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="r-stack" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
             <div>
                 <label for="soil_type" style="display:block;font-size:12px;font-weight:600;color:#a1a1aa;margin-bottom:0.35rem;">Soil type</label>
                 <select id="soil_type" name="soil_type" class="dot-input">

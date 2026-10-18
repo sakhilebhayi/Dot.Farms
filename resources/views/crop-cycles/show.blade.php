@@ -6,7 +6,7 @@
     $hasHarvests = $cropCycle->harvestRecords->isNotEmpty();
 @endphp
 <x-app-layout>
-<div style="padding:2rem 2.5rem 3rem;max-width:880px;">
+<div class="page-pad" style="padding:2rem 2.5rem 3rem;max-width:880px;">
     <div style="margin-bottom:1.5rem;">
         <a href="{{ route('fields.show', [$farm, $field]) }}" style="font-size:0.78rem;color:#a1a1aa;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span>
@@ -102,7 +102,7 @@
         </div>
 
         @if($status->isOpen())
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.06);">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:1rem;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.06);">
             @if($status->canTransitionTo(S::Failed))
             <form method="POST" action="{{ $transition }}" style="margin:0;">@csrf
                 <input type="hidden" name="action" value="fail">
@@ -132,6 +132,7 @@
         @if($cropCycle->plantingRecords->isEmpty())
             <p class="dot-muted" style="font-size:12.5px;margin:0;padding:0 1.5rem 1.25rem;">No planting recorded.@if($canOperate && $status->isOpen()) Record the first one below to start this cycle.@endif</p>
         @else
+            <div class="table-scroll">
             <table class="dot-table">
                 <thead><tr><th>Planted</th><th class="num">Quantity</th><th>Method</th><th></th></tr></thead>
                 <tbody>
@@ -150,6 +151,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @endif
 
         @if($canOperate && $status->isOpen())
@@ -203,6 +205,7 @@
                 @else No harvest was recorded on this cycle. @endif
             </p>
         @else
+            <div class="table-scroll">
             <table class="dot-table">
                 <thead><tr><th>Harvested</th><th class="num">Quantity</th><th>Grade</th><th></th></tr></thead>
                 <tbody>
@@ -221,6 +224,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @endif
 
         @if($canOperate && $status->acceptsHarvests())

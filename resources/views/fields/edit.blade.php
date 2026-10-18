@@ -1,5 +1,5 @@
 <x-app-layout>
-<div style="padding:2rem 2.5rem 3rem;max-width:560px;">
+<div class="page-pad" style="padding:2rem 2.5rem 3rem;max-width:560px;">
     <div style="margin-bottom:1.5rem;">
         <a href="{{ route('fields.show', [$farm, $field]) }}" style="font-size:0.78rem;color:#a1a1aa;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span>
@@ -14,7 +14,7 @@
         @csrf
         @method('PUT')
 
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;">
+        <div class="r-stack" style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;">
             <div>
                 <label for="name" class="dot-label">Field name</label>
                 <input id="name" name="name" type="text" class="dot-input" value="{{ old('name', $field->name) }}" required>
@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="r-stack" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
             <div>
                 <label for="soil_type" class="dot-label">Soil type</label>
                 <select id="soil_type" name="soil_type" class="dot-input">
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="r-stack" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
             <div>
                 <label for="size_hectares" class="dot-label">Size (hectares)</label>
                 <input id="size_hectares" name="size_hectares" type="number" step="0.01" min="0" class="dot-input" value="{{ old('size_hectares', $field->size_hectares) }}">

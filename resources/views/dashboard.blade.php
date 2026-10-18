@@ -1,5 +1,5 @@
 <x-app-layout>
-<div style="padding:2rem 2.5rem 3rem;">
+<div class="page-pad" style="padding:2rem 2.5rem 3rem;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
         <div>
             <h1 style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:#f4f4f5;margin:0 0 0.2rem;letter-spacing:-0.01em;">Farm Dashboard</h1>
@@ -50,6 +50,7 @@
                 <p class="dot-muted" style="font-size:0.78rem;margin:0;">Add a farm and a field, plan a crop cycle, record its planting, then record harvests from the cycle's page.</p>
             </div>
         @else
+            <div class="table-scroll">
             <table class="dot-table">
                 <thead>
                     <tr>
@@ -72,6 +73,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @endif
     </div>
 </div>

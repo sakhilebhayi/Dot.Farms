@@ -1,5 +1,5 @@
 <x-app-layout>
-<div style="padding:2rem 2.5rem 3rem;max-width:560px;">
+<div class="page-pad" style="padding:2rem 2.5rem 3rem;max-width:560px;">
     <div style="margin-bottom:1.5rem;">
         <a href="{{ route('crop-cycles.show', [$farm, $field, $cropCycle]) }}" style="font-size:0.78rem;color:#a1a1aa;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
             <span class="material-symbols-rounded" style="font-size:16px;">arrow_back</span>
