@@ -169,4 +169,23 @@ class FarmAuthorizationTest extends TestCase
             ->assertSee(route('harvests.edit', $w->harvest), false)
             ->assertSee(route('crop-cycles.planting.store', $this->cycleRouteParams($w)), false);
     }
+
+    public function test_an_editor_is_never_shown_a_button_that_would_answer_403(): void
+    {
+        $team = $this->teamWithOwner();
+        $this->actingAs($this->memberOf($team, 'editor'));
+
+        // An empty team: every "create" call to action must be absent for an editor.
+        $this->get(route('farms.index'))->assertOk()
+            ->assertDontSee(route('farms.create'), false)
+            ->assertSee('Ask a team owner or admin');
+        $this->get(route('dashboard'))->assertOk()->assertDontSee(route('farms.create'), false);
+        $this->get(route('crops.index'))->assertOk()->assertDontSee(route('crops.create'), false);
+
+        $w = $this->world($team);
+        Crop::query()->whereKey($w->crop->id)->update(['team_id' => $team->id]);
+        $this->get(route('fields.show', [$w->farm, $w->field]))->assertOk()
+            ->assertDontSee(route('fields.edit', [$w->farm, $w->field]), false)
+            ->assertSee(route('crop-cycles.create', [$w->farm, $w->field]), false);
+    }
 }

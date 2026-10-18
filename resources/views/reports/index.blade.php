@@ -45,7 +45,8 @@
                 <div class="dot-card" style="padding:0;margin-bottom:1rem;overflow:hidden;">
                     <div style="padding:0.85rem 1.1rem 0.5rem;"><span class="dot-kicker">{{ $seasonName }}</span></div>
                     <div style="overflow-x:auto;">
-                    <table class="dot-table">
+                    <table class="dot-table" style="table-layout:fixed;min-width:760px;">
+                        <colgroup><col style="width:22%"><col style="width:20%"><col style="width:12%"><col style="width:13%"><col style="width:17%"><col style="width:16%"></colgroup>
                         <thead>
                             <tr>
                                 <th>Field</th>

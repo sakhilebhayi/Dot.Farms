@@ -69,7 +69,7 @@
         .dot-input { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#f4f4f5; font-family:'Inter',sans-serif; font-size:13px; padding:8px 12px; width:100%; transition:border-color .15s,box-shadow .15s; outline:none; }
         .dot-input:focus { border-color:rgba(34,197,94,0.45); box-shadow:0 0 0 3px rgba(34,197,94,0.07); }
         .dot-input::placeholder { color:#3f3f46; }
-        .dot-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all .14s; border:none; text-decoration:none; font-family:'Inter',sans-serif; }
+        .dot-btn { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all .14s; border:none; text-decoration:none; font-family:'Inter',sans-serif; }
         .dot-btn-primary { background:#22c55e; color:#09090b; }
         .dot-btn-primary:hover { filter:brightness(1.1); }
         .dot-btn-ghost { background:rgba(255,255,255,0.06); color:#a1a1aa; border:1px solid rgba(255,255,255,0.08); }
