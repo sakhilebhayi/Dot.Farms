@@ -151,6 +151,33 @@ retry; if Notify stays down they are dropped after their third try). Retries and
 an idempotency key, `"harvest.recorded:{harvest record id}:{sha1(recipient email)}:recorded"`, so Notify
 collapses them.
 
+## Daily metrics to Dot.Analytics
+
+Dot.Farms publishes **one daily snapshot of aggregate numbers per company** to [Dot.Analytics](https://github.com/sakhilebhayi/Dot.Analytics), so its dashboards and briefings show real figures. Analytics only receives; this app never reads anything back from it, so an Analytics outage or a wrong setting changes nothing here (`farms:publish-metrics`, `App\Services\Analytics\MetricsCollector`, `POST /api/ingest/snapshots`).
+
+What is sent for a company (company = a team linked to InfoDot, not a personal team):
+
+```json
+{ "platform": "farms", "company_uuid": "<the team's InfoDot uuid>", "taken_at": "2026-11-05T00:00:00Z", "period": "day", "metrics": { ... } }
+```
+
+| Key | Meaning |
+|---|---|
+| `active_cycles` | crop cycles in the ground: planted or growing (the dashboard's "crops in season"); planned cycles are not counted |
+| `harvests_30d` | harvest records dated in the last 30 days, in any unit |
+| `harvested_kg_30d` | kilograms harvested in the last 30 days: **only `kg` and `t` count** (1 t = 1000 kg); bags, crates, bunches, litres, heads and unrecognised units are never converted or added in |
+
+No farm, field or crop names, notes, quality grades or any other row data are sent.
+
+**Aggregates only.** Never a name, email, title, reason, note or any other row. Counts leave out archived and deleted rows, every query is scoped to the one company, and "today" and the windows are in UTC.
+
+- **Nothing is sent until `ANALYTICS_INGEST_URL` and `ANALYTICS_INGEST_SECRET` are both set.** `ANALYTICS_INGEST_URL` is the full address ending `/api/ingest/snapshots`. `ANALYTICS_INGEST_SECRET` must equal `ANALYTICS_INGEST_SECRET_<PLATFORM KEY>` in Dot.Analytics' `.env`; `ANALYTICS_PLATFORM_KEY` defaults to `farms`.
+- **The scheduler must run** (`* * * * * php artisan schedule:run` from cron; this app had no scheduled task before this one): `farms:publish-metrics` is scheduled daily at 02:10 UTC. **A queue worker is required** (`php artisan queue:work`); with `QUEUE_CONNECTION=sync` the snapshots would be sent inline by the command, which is also fine.
+- Try it safely: `php artisan farms:publish-metrics --dry-run` prints each payload and sends nothing (it works with no configuration). `--company=<InfoDot team uuid>` limits a run to one company.
+- Safe to repeat: `taken_at` is the start of the UTC day, and Analytics treats the same company, platform, `taken_at` and period as one snapshot, so a re-run or a retry the same day cannot double count.
+- Analytics can never break or slow this app: 5 second timeout, no redirects followed, 3 tries with backoff (60 s, then 5 min), every failure caught and logged without the body or the secret, and after 5 failures in a row calls pause for 60 seconds (a cache-based circuit breaker). A snapshot that cannot be delivered is simply replaced by the next day's.
+- Requests are signed with HMAC-SHA256 over `"{timestamp}.{raw body}"` (`X-InfoDot-Timestamp`, `X-InfoDot-Signature: sha256=<hex>`), made at send time so a retry carries a fresh timestamp.
+
 ## Ecosystem
 
 **Dot.Farms** is one of the platforms in the Dot Ecosystem, connected via shared PostgreSQL and
