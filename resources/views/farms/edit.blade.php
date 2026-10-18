@@ -8,6 +8,7 @@
     </div>
 
     <h1 style="font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:700;color:#f4f4f5;margin:0 0 1.5rem;">Edit Farm</h1>
+    <x-form-errors />
 
     <form method="POST" action="{{ route('farms.update', $farm) }}" class="dot-card" style="padding:1.5rem;display:grid;gap:1rem;">
         @csrf
@@ -51,5 +52,25 @@
             <button type="submit" class="dot-btn dot-btn-primary">Save Changes</button>
         </div>
     </form>
+
+    @can('delete', $farm)
+    <div class="dot-danger-zone">
+        <h3 class="dot-h3" style="margin-bottom:0.35rem;">Delete this farm</h3>
+        @if($impact['fields'] > 0)
+            <p class="dot-muted" style="font-size:12.5px;margin:0 0 0.75rem;">
+                This also deletes its {{ $impact['fields'] }} {{ \Illuminate\Support\Str::plural('field', $impact['fields']) }},
+                {{ $impact['cycles'] }} crop {{ \Illuminate\Support\Str::plural('cycle', $impact['cycles']) }} and
+                {{ $impact['harvests'] }} harvest {{ \Illuminate\Support\Str::plural('record', $impact['harvests']) }}.
+                They leave every list and report, and the harvest totals drop accordingly.
+            </p>
+            <x-delete-form :action="route('farms.destroy', $farm)" label="Delete farm and everything in it"
+                cascade="I understand this removes {{ $impact['fields'] }} {{ \Illuminate\Support\Str::plural('field', $impact['fields']) }}, {{ $impact['cycles'] }} crop {{ \Illuminate\Support\Str::plural('cycle', $impact['cycles']) }} and {{ $impact['harvests'] }} harvest {{ \Illuminate\Support\Str::plural('record', $impact['harvests']) }} along with the farm." />
+        @else
+            <p class="dot-muted" style="font-size:12.5px;margin:0 0 0.75rem;">This farm has no fields, so nothing else is affected.</p>
+            <x-delete-form :action="route('farms.destroy', $farm)" label="Delete farm" confirm="Delete this farm?" />
+        @endif
+        @error('confirm_cascade')<p class="dot-error">{{ $message }}</p>@enderror
+    </div>
+    @endcan
 </div>
 </x-app-layout>

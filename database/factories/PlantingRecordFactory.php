@@ -17,7 +17,7 @@ class PlantingRecordFactory extends Factory
             'crop_cycle_id' => CropCycle::factory(),
             'planted_at' => $this->faker->dateTimeBetween('-4 months', '-2 months'),
             'quantity_planted' => $this->faker->randomFloat(2, 10, 500),
-            'unit' => $this->faker->randomElement(['kg', 'seeds', 'seedlings']),
+            'unit' => $this->faker->randomElement(['kg', 'seed', 'seedling']),
             'method' => $this->faker->randomElement(['direct-seed', 'transplant', 'broadcast']),
             'notes' => null,
         ];

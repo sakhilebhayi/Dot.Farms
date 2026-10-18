@@ -78,9 +78,11 @@ class CrossTeamIsolationTest extends TestCase
         ]);
         $otherHarvest = HarvestRecord::factory()->create(['crop_cycle_id' => $otherCycle->id]);
 
+        // HarvestRecord now carries HasTeamChainScope, so (like Farm and Field above)
+        // the record is invisible to route binding: 404, not 403.
         $this->actingAs($user)
             ->get(route('harvests.show', $otherHarvest))
-            ->assertForbidden();
+            ->assertNotFound();
     }
 
     public function test_user_cannot_add_a_field_to_another_teams_farm(): void

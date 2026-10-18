@@ -40,10 +40,16 @@
         @endif
     </div>
 
-    <div style="margin-top:1.25rem;">
+    <div style="margin-top:1.25rem;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
         <a href="{{ route('crop-cycles.show', [$harvestRecord->cropCycle->field->farm, $harvestRecord->cropCycle->field, $harvestRecord->cropCycle]) }}" class="dot-btn dot-btn-ghost">
             View crop cycle
         </a>
+        @if($canOperate)
+            <a href="{{ route('harvests.edit', $harvestRecord) }}" class="dot-btn dot-btn-ghost">Correct this harvest</a>
+        @endif
+        @if($canManage)
+            <x-delete-form :action="route('harvests.destroy', $harvestRecord)" label="Delete" confirm="Delete this harvest record?" />
+        @endif
     </div>
 </div>
 </x-app-layout>

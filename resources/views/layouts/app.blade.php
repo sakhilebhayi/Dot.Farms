@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <title>Dot.Farms</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
@@ -68,13 +69,35 @@
         .dot-input { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; color:#f4f4f5; font-family:'Inter',sans-serif; font-size:13px; padding:8px 12px; width:100%; transition:border-color .15s,box-shadow .15s; outline:none; }
         .dot-input:focus { border-color:rgba(34,197,94,0.45); box-shadow:0 0 0 3px rgba(34,197,94,0.07); }
         .dot-input::placeholder { color:#3f3f46; }
-        .dot-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all .14s; border:none; text-decoration:none; font-family:'Inter',sans-serif; }
+        .dot-btn { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all .14s; border:none; text-decoration:none; font-family:'Inter',sans-serif; }
         .dot-btn-primary { background:#22c55e; color:#09090b; }
         .dot-btn-primary:hover { filter:brightness(1.1); }
         .dot-btn-ghost { background:rgba(255,255,255,0.06); color:#a1a1aa; border:1px solid rgba(255,255,255,0.08); }
         .dot-btn-ghost:hover { background:rgba(255,255,255,0.1); color:#f4f4f5; }
         .dot-badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:100px; font-size:11px; font-weight:600; }
         .dot-badge-accent { background:rgba(34,197,94,0.12); color:#22c55e; }
+        .dot-btn-danger { background:rgba(239,68,68,0.1); color:#f87171; border:1px solid rgba(239,68,68,0.28); }
+        .dot-btn-danger:hover { background:rgba(239,68,68,0.18); color:#fca5a5; }
+        .dot-btn-sm { padding:4px 10px; font-size:12px; }
+        .dot-btn[disabled] { opacity:.45; cursor:not-allowed; filter:none; }
+        .dot-label { display:block; font-size:12px; font-weight:600; color:#a1a1aa; margin-bottom:0.35rem; }
+        .dot-error { color:#f87171; font-size:11.5px; margin:0.35rem 0 0; }
+        .dot-alert { border:1px solid rgba(239,68,68,0.3); background:rgba(239,68,68,0.08); color:#fca5a5; border-radius:8px; padding:0.75rem 1rem; font-size:12.5px; margin-bottom:1.25rem; }
+        .dot-alert p { margin:0; } .dot-alert p + p { margin-top:0.25rem; }
+        .dot-kicker { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; color:#8b8b94; }
+        .dot-h3 { font-family:'Syne',sans-serif; font-size:0.875rem; font-weight:700; color:#f4f4f5; margin:0; }
+        .dot-muted { color:#8b8b94; }
+        .dot-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+        .dot-table th { text-align:left; padding:10px 14px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:#8b8b94; }
+        .dot-table td { padding:9px 14px; color:#d4d4d8; border-top:1px solid rgba(255,255,255,0.06); vertical-align:middle; }
+        .dot-table td.num, .dot-table th.num { text-align:right; }
+        .dot-row-actions { display:flex; gap:0.4rem; justify-content:flex-end; align-items:center; }
+        .dot-check { display:flex; gap:0.5rem; align-items:flex-start; font-size:12px; color:#d4d4d8; margin:0.5rem 0 0.75rem; }
+        .dot-check input { margin-top:3px; accent-color:#22c55e; }
+        .dot-danger-zone { border:1px solid rgba(239,68,68,0.22); border-radius:12px; padding:1.25rem 1.5rem; margin-top:1.5rem; }
+        .dot-filter-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.75rem; align-items:end; }
+        .dot-stat-line { display:flex; flex-wrap:wrap; gap:0.35rem 1.25rem; }
+        :focus-visible { outline:2px solid #22c55e; outline-offset:2px; }
         select.dot-input option { background:#1a1a1f; }
         .dot-loading-overlay { display:flex; align-items:center; justify-content:center; padding:2.5rem 0; }
         .dot-spin { animation: dot-spin 0.9s linear infinite; }
@@ -119,6 +142,10 @@
             <a href="{{ route('harvests.index') }}" class="nav-item {{ request()->routeIs('harvests.*') ? 'active' : '' }}">
                 <span class="material-symbols-rounded nav-icon">nutrition</span>
                 Harvests
+            </a>
+            <a href="{{ route('reports.index') }}" class="nav-item {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                <span class="material-symbols-rounded nav-icon">insights</span>
+                Reports
             </a>
             <div class="sidebar-divider" style="margin:10px 0;"></div>
             <a href="{{ route('profile.show') }}" class="nav-item {{ request()->routeIs('profile.show') ? 'active' : '' }}">

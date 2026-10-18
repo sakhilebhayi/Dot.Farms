@@ -5,17 +5,21 @@
             <h1 style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:#f4f4f5;margin:0 0 0.2rem;letter-spacing:-0.01em;">Farms</h1>
             <p style="font-size:0.78rem;color:#52525b;margin:0;">{{ $farms->count() }} farm{{ $farms->count() === 1 ? '' : 's' }} on this team</p>
         </div>
+        @can('create', \App\Models\Farm::class)
         <a href="{{ route('farms.create') }}" class="dot-btn dot-btn-primary">
             <span class="material-symbols-rounded" style="font-size:16px;">add</span>
             New Farm
         </a>
+        @endcan
     </div>
 
     @if($farms->isEmpty())
         <div class="dot-card" style="padding:3rem 1.5rem;text-align:center;">
             <span class="material-symbols-rounded" style="font-size:36px;color:#3f3f46;display:block;margin-bottom:0.75rem;">agriculture</span>
-            <p style="font-size:0.85rem;color:#52525b;margin:0 0 1rem;">No farms yet. Add your first one to get started.</p>
+            <p style="font-size:0.85rem;color:#a1a1aa;margin:0 0 1rem;">No farms yet.@can('create', \App\Models\Farm::class) Add your first one to get started.@else Ask a team owner or admin to add the first farm.@endcan</p>
+            @can('create', \App\Models\Farm::class)
             <a href="{{ route('farms.create') }}" class="dot-btn dot-btn-primary">Add a farm</a>
+            @endcan
         </div>
     @else
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;">
