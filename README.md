@@ -58,6 +58,19 @@ harvest-ready. See `wiki.md` for the full platform description.
 
 Not built: yield forecasting, weather integration, moisture/sensor telemetry, record restore (deletes are soft but there is no undelete screen), outbound event publishing to Dot.Brain/Dot.Emall (the domain models describe the trigger points; nothing fires yet).
 
+## Roles
+
+Access follows the team (company) role. InfoDot is the source of truth and the role is re-applied at every sign-in.
+
+| InfoDot role | Dot.Farms role | Can |
+|---|---|---|
+| owner, admin | admin (owner for the creator) | everything: farms, fields and crops; delete cycles, plantings and harvests |
+| editor | editor | run the season: plan and edit crop cycles, move them through their lifecycle, record and correct plantings and harvests; read and export |
+| viewer | viewer | read only: farms, fields, crops, cycles, harvests and the reports, and the harvest CSV export, exactly the read surface an editor has; no write control is shown and every write route answers 403 |
+| anything else | viewer | an unrecognised InfoDot role gets the least powerful role, never editor |
+
+The harvest CSV export is open to viewers because it is the same data the harvest list and the reports show and editors may export it. It is a single ability, `HarvestRecordPolicy::export()`, if that ever needs to be narrowed. The role matrix is in `tests/Feature/Farms/ViewerRoleMatrixTest.php`.
+
 ## Domain Models
 
 - **Farm**: tenant root (`team_id`)

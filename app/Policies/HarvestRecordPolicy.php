@@ -22,6 +22,16 @@ class HarvestRecordPolicy
         return $this->currentTeam($user) !== null;
     }
 
+    /**
+     * The harvest CSV is the data the list and the reports already show, so it is
+     * open to whoever may read them: every member, viewers included, because editors
+     * may. Tighten it here, in one place, if that decision changes.
+     */
+    public function export(User $user): bool
+    {
+        return $this->currentTeam($user) !== null && $this->isMember($user, $this->currentTeam($user));
+    }
+
     public function view(User $user, HarvestRecord $record): bool
     {
         return $this->isMember($user, $this->teamOfRecord($record));

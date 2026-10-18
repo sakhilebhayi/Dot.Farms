@@ -57,5 +57,9 @@ class JetstreamServiceProvider extends ServiceProvider
             'create',
             'update',
         ])->description('Editor users have the ability to read, create, and update.');
+
+        Jetstream::role('viewer', 'Viewer', [
+            'read',
+        ])->description('Viewers can read farms, fields, crops, cycles, harvests and the reports, and export harvests, exactly like editors can. They cannot create, record, correct or delete anything.');
     }
 }

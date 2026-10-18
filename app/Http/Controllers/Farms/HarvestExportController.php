@@ -24,7 +24,7 @@ class HarvestExportController extends Controller
 
     public function __invoke(Request $request): StreamedResponse
     {
-        Gate::authorize('viewAny', HarvestRecord::class);
+        Gate::authorize('export', HarvestRecord::class);
 
         $team = $request->user()->currentTeam;
         $filters = HarvestFilters::fromRequest($request);

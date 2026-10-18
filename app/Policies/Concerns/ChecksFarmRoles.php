@@ -17,11 +17,13 @@ use App\Models\User;
  *                           delete cycles, plantings and harvests
  *   operate (+ editor)      plan and edit crop cycles, move them through their
  *                           lifecycle, record and correct plantings and harvests
- *   read    (any member)    view everything and export harvests
+ *   read    (any member)    view everything and export harvests; this is the
+ *                           `viewer` role (InfoDot's read-only members), which has
+ *                           exactly the read surface an editor has
  *
  * An editor can therefore fix a mistaken harvest by editing it, but only an
  * owner/admin can remove records or change the farm structure. A member whose
- * role is neither admin nor editor is read-only.
+ * role is neither admin nor editor (the `viewer`) is read-only.
  *
  * Team membership is resolved through the parent chain with the model scopes
  * switched off, so these checks are independent of the global team scope:
