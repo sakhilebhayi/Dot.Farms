@@ -164,11 +164,11 @@ class HarvestExportTest extends TestCase
 
     public function test_the_harvest_list_filters_by_season(): void
     {
-        $this->harvest($this->cycle('2026 Summer'), ['quantity_harvested' => 111]);
-        $this->harvest($this->cycle('2026 Winter', 'Wheat'), ['quantity_harvested' => 222]);
+        $this->harvest($this->cycle('2026 Summer'), ['quantity_harvested' => 48271]);
+        $this->harvest($this->cycle('2026 Winter', 'Wheat'), ['quantity_harvested' => 53907]);
 
         $this->actingAs($this->team->owner)->get(route('harvests.index', ['season' => '2026 Winter']))
-            ->assertOk()->assertSee('Wheat')->assertDontSee('111');
+            ->assertOk()->assertSee('Wheat')->assertDontSee('48271');
     }
 
     public function test_the_empty_harvest_list_explains_how_a_harvest_gets_recorded(): void
