@@ -3,6 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\HarvestRecord;
+use App\Notifications\Concerns\SendsNotifyEvent;
+use App\Services\Notify\NotifyClient;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
@@ -21,6 +23,8 @@ use Illuminate\Notifications\Notification;
  */
 class HarvestRecordedNotification extends Notification
 {
+    use SendsNotifyEvent;
+
     public function __construct(public HarvestRecord $harvestRecord) {}
 
     /**
@@ -28,7 +32,39 @@ class HarvestRecordedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['database', 'broadcast', ...$this->notifyChannel()];
+    }
+
+    /**
+     * The email-worthy copy of this notice for Dot.Notify (harvest.recorded), for the same team
+     * members who get the in-app notice. The company is the harvest's own team (the owner of the
+     * data), never the recipient's current team, so a harvest is never announced on behalf of
+     * another company. A team not linked to InfoDot has no uuid and is skipped.
+     *
+     * @return array{company_uuid: string|null, event: string, subject: int, bucket: string, data: array<string, string>}
+     */
+    public function toNotifyEvent(object $notifiable): array
+    {
+        $this->harvestRecord->loadMissing('cropCycle.crop', 'cropCycle.field.farm.team');
+        $cycle = $this->harvestRecord->cropCycle;
+        $field = $cycle->field;
+        $farm = $field->farm;
+
+        return [
+            'company_uuid' => $farm->team?->infodot_team_uuid,
+            'event' => 'harvest.recorded',
+            'subject' => $this->harvestRecord->id,
+            'bucket' => 'recorded',
+            'data' => [
+                'farm_name' => (string) $farm->name,
+                'field_name' => (string) $field->name,
+                'crop' => (string) $cycle->crop->name,
+                'quantity' => number_format((float) $this->harvestRecord->quantity_harvested, 2, '.', ''),
+                'unit' => (string) $this->harvestRecord->unit,
+                'harvested_at' => $this->harvestRecord->harvested_at?->toIso8601String() ?? '',
+                'url' => app(NotifyClient::class)->pageUrl('harvests.show', $this->harvestRecord),
+            ],
+        ];
     }
 
     public function toBroadcast(object $notifiable): BroadcastMessage

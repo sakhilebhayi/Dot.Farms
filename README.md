@@ -117,6 +117,40 @@ Feature tests use an in-memory SQLite connection (see `phpunit.xml`) and Laravel
 trait, so no Postgres instance is needed to run them. The report queries and the migration are written
 to be portable between SQLite and PostgreSQL; the suite only exercises SQLite.
 
+## Email via Dot.Notify
+
+The in-app harvest notification this app already creates is also posted, server to server, to Dot.Notify
+(`POST {NOTIFY_INGEST_URL}`, signed with HMAC-SHA256 over `"{timestamp}.{raw body}"` using
+`NOTIFY_INGEST_SECRET`, headers `X-InfoDot-Timestamp` and `X-InfoDot-Signature`), so a company can turn
+it into an email. Same trigger (a harvest record is created, after its transaction commits) and the same
+recipients (every member of the harvest's team) as the in-app notification.
+
+| Event | Sent to | `data` keys |
+|---|---|---|
+| `harvest.recorded` | each member of the farm's team, one event per person | `farm_name`, `field_name`, `crop`, `quantity` (two decimals, e.g. `"500.00"`), `unit`, `harvested_at` (ISO 8601), `url` |
+
+`url` is an absolute `https` link to the harvest page in this app. The email address is only ever in
+`recipient.email`; no other member's address is sent.
+
+**What it takes for an email to go out:** nothing is sent until `NOTIFY_INGEST_URL` **and**
+`NOTIFY_INGEST_SECRET` are both set, **and** the company has enabled the event in Dot.Notify (otherwise
+Notify answers `no_rule` and sends nothing). A **queue worker is required** (`php artisan queue:work`):
+events are queued after the harvest transaction commits, so a rolled-back harvest sends nothing, and
+nothing is ever posted inside the user's request.
+
+**Who is skipped:** Notify routes by company. For a harvest the company is the **farm's own team**
+(`teams.infodot_team_uuid`), not each recipient's current team, so a harvest is never announced on behalf
+of another company. A team without an `infodot_team_uuid` (not provisioned from InfoDot), or a member with
+no email, is skipped, with only an info log line (event name and user id, never an address). The in-app
+notification is unaffected.
+
+**Safety:** a Notify outage or misconfiguration cannot break or slow recording a harvest. The job has a
+5 second HTTP timeout, 3 tries with backoff, never throws, logs without secrets or email addresses, and a
+small cache-based circuit breaker pauses calls for 60 seconds after 5 consecutive failures (jobs wait and
+retry; if Notify stays down they are dropped after their third try). Retries and double dispatches share
+an idempotency key, `"harvest.recorded:{harvest record id}:{sha1(recipient email)}:recorded"`, so Notify
+collapses them.
+
 ## Ecosystem
 
 **Dot.Farms** is one of the platforms in the Dot Ecosystem, connected via shared PostgreSQL and
