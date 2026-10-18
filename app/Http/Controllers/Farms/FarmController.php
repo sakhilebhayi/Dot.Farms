@@ -9,6 +9,7 @@ use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -79,7 +80,8 @@ class FarmController extends Controller
         }]);
 
         $recentHarvests = HarvestRecord::query()
-            ->whereHas('cropCycle.field', fn ($q) => $q->where('farm_id', $farm->id))
+            ->forTeam($farm->team_id)
+            ->whereIn('crop_cycle_id', $farm->cropCycles()->select('crop_cycles.id'))
             ->with(['cropCycle.crop', 'cropCycle.field'])
             ->latest('harvested_at')
             ->take(5)
@@ -97,6 +99,7 @@ class FarmController extends Controller
 
         return view('farms.edit', [
             'farm' => $farm,
+            'impact' => $farm->deletionImpact(),
         ]);
     }
 
@@ -115,5 +118,26 @@ class FarmController extends Controller
         $farm->update($validated);
 
         return redirect()->route('farms.show', $farm)->with('flash.banner', 'Farm updated.');
+    }
+
+    /**
+     * Soft-delete the farm and, softly and in one transaction, everything
+     * beneath it. A farm that has fields needs an explicit confirmation.
+     */
+    public function destroy(Request $request, Farm $farm): RedirectResponse
+    {
+        Gate::authorize('delete', $farm);
+
+        $impact = $farm->deletionImpact();
+
+        if ($impact['fields'] > 0 && ! $request->boolean('confirm_cascade')) {
+            return back()->withErrors([
+                'confirm_cascade' => "Confirm to delete \"{$farm->name}\" together with its {$impact['fields']} field(s), {$impact['cycles']} crop cycle(s) and {$impact['harvests']} harvest record(s).",
+            ]);
+        }
+
+        DB::transaction(fn () => $farm->delete());
+
+        return redirect()->route('farms.index')->with('flash.banner', "Farm \"{$farm->name}\" deleted.");
     }
 }

@@ -120,7 +120,11 @@ class CropCycleLifecycle
     public function markGrowing(CropCycle $cycle): CropCycle
     {
         return $this->atomically($cycle, function (CropCycle $cycle) {
-            $this->assertCanMoveTo($cycle, Status::Growing);
+            // The transition table also lists closed -> growing (that is re-opening, which has
+            // its own action), so "mark growing" is restricted to planted explicitly.
+            if ($cycle->status !== Status::Planted) {
+                throw InvalidCycleTransition::because("Only a planted cycle can be marked growing; this one is {$cycle->status->value}.");
+            }
             $cycle->forceFill(['status' => Status::Growing, 'growing_at' => now()])->save();
 
             return $cycle;

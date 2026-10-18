@@ -12,6 +12,7 @@
             <h1 style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:#f4f4f5;margin:0 0 0.2rem;letter-spacing:-0.01em;">{{ $farm->name }}</h1>
             <p style="font-size:0.78rem;color:#52525b;margin:0;">{{ $farm->location ?? 'No location set' }}{{ $farm->size_hectares ? ' · '.number_format((float) $farm->size_hectares, 1).' ha' : '' }}</p>
         </div>
+        @can('update', $farm)
         <div style="display:flex;gap:0.5rem;">
             <a href="{{ route('farms.edit', $farm) }}" class="dot-btn dot-btn-ghost">Edit</a>
             <a href="{{ route('fields.create', $farm) }}" class="dot-btn dot-btn-primary">
@@ -19,15 +20,17 @@
                 Add Field
             </a>
         </div>
+        @endcan
     </div>
 
     <div class="dot-card" style="padding:1.5rem;margin-bottom:1.25rem;">
+        <x-form-errors />
         <h3 style="font-family:'Syne',sans-serif;font-size:0.875rem;font-weight:700;color:#f4f4f5;margin:0 0 1.25rem;">Fields</h3>
 
         @if($farm->fields->isEmpty())
             <div style="text-align:center;padding:2rem 0;">
                 <span class="material-symbols-rounded" style="font-size:32px;color:#3f3f46;display:block;margin-bottom:0.5rem;">landscape</span>
-                <p style="font-size:0.8rem;color:#52525b;margin:0;">No fields yet. Add the first one.</p>
+                <p style="font-size:0.8rem;color:#8b8b94;margin:0;">No fields yet.@can('update', $farm) Add the first one with "Add Field" above.@endcan</p>
             </div>
         @else
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;">

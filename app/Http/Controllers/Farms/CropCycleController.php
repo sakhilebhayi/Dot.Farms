@@ -2,22 +2,33 @@
 
 namespace App\Http\Controllers\Farms;
 
+use App\Enums\CropCycleStatus;
+use App\Enums\Unit;
 use App\Http\Controllers\Controller;
 use App\Models\Crop;
 use App\Models\CropCycle;
 use App\Models\Farm;
 use App\Models\Field;
+use App\Services\Farms\UnitTotals;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class CropCycleController extends Controller
 {
+    /** A crop must belong to the farm's own team and not be deleted. */
+    private function cropRule(Farm $farm): array
+    {
+        return ['required', Rule::exists('crops', 'id')->where('team_id', $farm->team_id)->whereNull('deleted_at')];
+    }
+
     public function create(Farm $farm, Field $field): View
     {
-        Gate::authorize('update', $farm);
-        abort_unless($field->farm_id === $farm->id, 404);
+        Gate::authorize('create', [CropCycle::class, $field]);
 
         // $farm is only reachable here if it's in the current team (Farm's
         // HasTeamScope), so Crop's own HasTeamScope already limits this to
@@ -33,26 +44,18 @@ class CropCycleController extends Controller
 
     public function store(Request $request, Farm $farm, Field $field): RedirectResponse
     {
-        Gate::authorize('update', $farm);
-        abort_unless($field->farm_id === $farm->id, 404);
+        Gate::authorize('create', [CropCycle::class, $field]);
 
         $validated = $request->validate([
-            'crop_id' => ['required', 'exists:crops,id'],
+            'crop_id' => $this->cropRule($farm),
             'season' => ['required', 'string', 'max:100'],
             'expected_harvest_at' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
         ]);
 
-        // Same reasoning as create(): Crop's HasTeamScope already limits
-        // this lookup to the current (== $farm's) team.
-        abort_unless(
-            Crop::where('id', $validated['crop_id'])->exists(),
-            404
-        );
-
         $cropCycle = $field->cropCycles()->create([
             ...$validated,
-            'status' => CropCycle::STATUS_PLANNED,
+            'status' => CropCycleStatus::Planned,
         ]);
 
         return redirect()
@@ -62,16 +65,80 @@ class CropCycleController extends Controller
 
     public function show(Farm $farm, Field $field, CropCycle $cropCycle): View
     {
-        Gate::authorize('view', $farm);
-        abort_unless($field->farm_id === $farm->id, 404);
-        abort_unless($cropCycle->field_id === $field->id, 404);
+        Gate::authorize('view', $cropCycle);
 
-        $cropCycle->load(['crop', 'plantingRecords', 'harvestRecords']);
+        $cropCycle->load(['crop', 'plantingRecords' => fn ($q) => $q->orderBy('planted_at'), 'harvestRecords' => fn ($q) => $q->orderBy('harvested_at')]);
+
+        $harvestTotals = new UnitTotals;
+        foreach ($cropCycle->harvestRecords as $record) {
+            $harvestTotals->add($record->unit, $record->quantity_harvested);
+        }
 
         return view('crop-cycles.show', [
             'farm' => $farm,
             'field' => $field,
             'cropCycle' => $cropCycle,
+            'harvestTotals' => $harvestTotals,
+            'plantingUnits' => Unit::forPlanting(),
+            'harvestUnits' => Unit::forHarvest(),
+            'canOperate' => Gate::allows('update', $cropCycle),
+            'canManage' => Gate::allows('delete', $cropCycle),
+            'impact' => $cropCycle->deletionImpact(),
         ]);
+    }
+
+    public function edit(Farm $farm, Field $field, CropCycle $cropCycle): View
+    {
+        Gate::authorize('update', $cropCycle);
+
+        return view('crop-cycles.edit', [
+            'farm' => $farm,
+            'field' => $field,
+            'cropCycle' => $cropCycle->load('crop'),
+            'crops' => Crop::orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(Request $request, Farm $farm, Field $field, CropCycle $cropCycle): RedirectResponse
+    {
+        Gate::authorize('update', $cropCycle);
+
+        $rules = [
+            'season' => ['required', 'string', 'max:100'],
+            'expected_harvest_at' => ['nullable', 'date'],
+            'notes' => ['nullable', 'string'],
+        ];
+
+        // The crop can only change before anything is planted; afterwards the
+        // records on the cycle are records of that crop.
+        if ($request->filled('crop_id') && (int) $request->input('crop_id') !== $cropCycle->crop_id) {
+            if ($cropCycle->status !== CropCycleStatus::Planned) {
+                throw ValidationException::withMessages(['crop_id' => 'The crop cannot be changed once planting has started.']);
+            }
+            $rules['crop_id'] = $this->cropRule($farm);
+        }
+
+        $validated = $request->validate($rules);
+
+        $cropCycle->update($validated);
+
+        return redirect()->route('crop-cycles.show', [$farm, $field, $cropCycle])->with('flash.banner', 'Crop cycle updated.');
+    }
+
+    public function destroy(Request $request, Farm $farm, Field $field, CropCycle $cropCycle): RedirectResponse
+    {
+        Gate::authorize('delete', $cropCycle);
+
+        $impact = $cropCycle->deletionImpact();
+
+        if (($impact['plantings'] + $impact['harvests']) > 0 && ! $request->boolean('confirm_cascade')) {
+            return back()->withErrors([
+                'confirm_cascade' => "Confirm to delete this cycle together with its {$impact['plantings']} planting(s) and {$impact['harvests']} harvest record(s).",
+            ]);
+        }
+
+        DB::transaction(fn () => $cropCycle->delete());
+
+        return redirect()->route('fields.show', [$farm, $field])->with('flash.banner', 'Crop cycle deleted.');
     }
 }

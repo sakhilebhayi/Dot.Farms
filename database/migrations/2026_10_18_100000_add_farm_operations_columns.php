@@ -58,6 +58,13 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Dropping deleted_at would silently bring every soft-deleted row back to
+        // life (a deleted farm reappearing is worse than it staying deleted), so
+        // rows that were deleted are removed for good first, children before parents.
+        foreach (['harvest_records', 'planting_records', 'crop_cycles', 'fields', 'crops', 'farms'] as $name) {
+            DB::table($name)->whereNotNull('deleted_at')->delete();
+        }
+
         DB::statement('DROP INDEX fields_farm_id_code_live_unique');
         Schema::table('fields', fn (Blueprint $table) => $table->unique(['farm_id', 'code']));
 

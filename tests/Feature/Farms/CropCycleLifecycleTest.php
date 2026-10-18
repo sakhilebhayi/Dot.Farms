@@ -134,8 +134,14 @@ class CropCycleLifecycleTest extends TestCase
         $this->assertSame(CropCycleStatus::Growing, $planted->refresh()->status);
         $this->assertNotNull($planted->growing_at);
 
-        $this->expectException(ValidationException::class);
-        $this->lifecycle()->markGrowing($this->cycle('planned'));
+        foreach (['planned', 'growing', 'harvested', 'failed', 'abandoned'] as $state) {
+            try {
+                $this->lifecycle()->markGrowing($this->cycle($state));
+                $this->fail("a {$state} cycle was marked growing");
+            } catch (ValidationException $e) {
+                $this->assertArrayHasKey('cycle', $e->errors(), $state);
+            }
+        }
     }
 
     public function test_closing_requires_at_least_one_harvest(): void

@@ -107,6 +107,12 @@ class CropCycle extends Model
         return $this->hasMany(HarvestRecord::class);
     }
 
+    /** What deleting this cycle would soft-delete beneath it. @return array{plantings: int, harvests: int} */
+    public function deletionImpact(): array
+    {
+        return ['plantings' => $this->plantingRecords()->count(), 'harvests' => $this->harvestRecords()->count()];
+    }
+
     /** In-season means it's been planted but not yet closed (planted or growing). */
     public function isInSeason(): bool
     {

@@ -67,6 +67,15 @@ class Field extends Model
         return $this->hasMany(CropCycle::class);
     }
 
+    /** What deleting this field would soft-delete beneath it. @return array{cycles: int, harvests: int} */
+    public function deletionImpact(): array
+    {
+        return [
+            'cycles' => $this->cropCycles()->count(),
+            'harvests' => HarvestRecord::query()->whereIn('crop_cycle_id', $this->cropCycles()->select('crop_cycles.id'))->count(),
+        ];
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';

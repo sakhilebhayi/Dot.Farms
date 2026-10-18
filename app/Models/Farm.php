@@ -65,6 +65,19 @@ class Farm extends Model
         return $this->hasManyThrough(CropCycle::class, Field::class);
     }
 
+    /** What deleting this farm would soft-delete beneath it. @return array{fields: int, cycles: int, harvests: int} */
+    public function deletionImpact(): array
+    {
+        $fieldIds = $this->fields()->select('fields.id');
+        $cycleIds = CropCycle::query()->whereIn('field_id', $fieldIds)->select('crop_cycles.id');
+
+        return [
+            'fields' => $this->fields()->count(),
+            'cycles' => CropCycle::query()->whereIn('field_id', $fieldIds)->count(),
+            'harvests' => HarvestRecord::query()->whereIn('crop_cycle_id', $cycleIds)->count(),
+        ];
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';
